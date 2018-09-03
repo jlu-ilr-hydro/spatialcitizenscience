@@ -5,7 +5,7 @@ under windows:
 
 pip3 install flask
 
-Open cmd and navigate in to the soilcraks folder.
+Open cmd and navigate in to the soilcracks folder.
 An easy way to do this, is to navigate via explorer to ..\soilcracks and hold ctrl + shift while pressing the right button on you mouse. Left click on "open cmd here".
 
 then run:
