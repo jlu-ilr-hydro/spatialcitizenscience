@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block map %}
+	<div id="mapid"></div>
+	
+	<script> 
+		var mymap = L.map('mapid').locate({setView: true, maxZoom: 16});
+		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox.streets',
+		accessToken: 'your.mapbox.access.token'}).addTo(mymap);
+	
+		
+		function onLocationFound(e) {
+		var radius = e.accuracy / 2;
+
+		L.marker(e.latlng).addTo(mymap)
+			
+			.bindPopup('<b>Da bist du! (Genauigkeit: ' + radius + 'm)</b><br>Erstelle <a href="{{ url_for('form') }}">hier</a> einen Eintrag').openPopup();
+
+		L.circle(e.latlng, radius).addTo(mymap);
+		}
+		
+	mymap.on('locationfound', onLocationFound);
+	
+	
+	
+		 mymap.on('click', 
+		 	function(e){
+				var coord = e.latlng.toString().split(',');
+				var lat = coord[0].split('(');
+		 		var lng = coord[1].split(')');
+				
+		 		//alert("You clicked the map at LAT: " + lat[1] + " and LONG: " + lng[0]);
+		 		var newMarker = L.marker(e.latlng, {draggable:'true'}).addTo(mymap)
+				
+				//.on('dragend', function() {
+			//var coord = String(myMarker.getLatLng()).split(',');
+			//})
+			
+				.bindPopup('<b>Da bist du?</b><br>Erstelle <a href="{{ url_for('form') }}">hier</a> einen Eintrag').openPopup();
+				
+				newMarker.on('dragend', function() {
+			var coord = String(newMarker.getLatLng()).split(',');
+			console.log(coord);
+			var lat = coord[0].split('(');
+			console.log(lat);
+			var lng = coord[1].split(')');
+			console.log(lng);
+			newMarker.bindPopup("Moved to: " + lat[1] + ", " + lng[0] + ".").openPopup();
+		});
+				
+			});
+
+		
+	</script>
+	
+
+
+{% endblock map %}
+

@@ -1,0 +1,12 @@
+#mapid {
+	/*height: 500px;
+	max-width:80%;
+	margin: auto;*/
+	position: fixed;
+	top: 54px;
+	left: 0;
+	bottom: 40px;
+	right: 0;
+	overflow: auto;
+ }
+ 

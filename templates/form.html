@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+	<h3>Using CSS to style an HTML Form</h3>
+
+<div class="form">
+  <form action="/action_page.php">
+  
+	<label for="longi">Longitude</label>
+    <input type="number" id="longi" name="longitude" placeholder="Deine Longitude..">
+	
+	<label for="lati">Latitude</label>
+    <input type="number" id="lati" name="latitude" placeholder="Deine Latitude..">
+	
+    <label for="breite">Breite des Bodenrisses</label>
+    <input type="number" id="breite" name="breite_des_bodenrisses" placeholder="Breite..">
+	
+	<label for="länge">Länge des Bodenrisses</label>
+    <input type="number" id="länge" name="lreite_des_bodenrisses" placeholder="Länge..">
+	
+	<label for="tiefe">Tiefe des Bodenrisses</label>
+    <input type="number" id="tiefe" name="tiefe_des_bodenrisses" placeholder="Tiefe..">
+	
+    <label for="standorttyp">Standorttyp</label>
+    <select id="standorttyp" name="standorttyp">
+	
+      <option value="acker">Acker</option>
+      <option value="grünland">Grünland</option>
+      <option value="siedlungsfläche">Siedlungsfläche</option>
+	  <option value="wald">Wald</option>
+	  <option value="sonstige">Sonstige</option>
+    </select>
+	
+	 <label for="kommentar">Kommentar (max. 100 Zeichen)</label>
+    <input type="text" id="kommentar" name="kommentar" placeholder="Hinterlasse einen Kommentar..." maxlength=100>
+	
+    <input type="submit" value="Submit">
+  </form>
+</div>
+{% endblock content %}
