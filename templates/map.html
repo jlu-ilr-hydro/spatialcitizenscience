@@ -2,58 +2,240 @@
 {% block map %}
 	<div id="mapid"></div>
 	
-	<script> 
-		var mymap = L.map('mapid').locate({setView: true, maxZoom: 16});
-		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-		id: 'mapbox.streets',
-		accessToken: 'your.mapbox.access.token'}).addTo(mymap);
+	<div id="icon"></div>
 	
-		
-		function onLocationFound(e) {
-		var radius = e.accuracy / 2;
-
-		L.marker(e.latlng).addTo(mymap)
+	<script type=text/javascript>
+	
+	
+	<!-- create empty Layers -->
+	var markers = {};
+	var circles = {};
+	
+	
+	<!-- create map object on load it -->
+	var mymap = L.map('mapid').setView([51.505, -0.09], 16);
+				L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+				attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+				id: 'mapbox.streets',
+				accessToken: 'your.mapbox.access.token'}).addTo(mymap);
+				
+	<!-- create control object -->
+	var myCustomControl = L.Control.extend({
+		options: {
+			position: 'topleft' 
+			//control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
+			},
+		onAdd: function (mymap) {
+			var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
 			
-			.bindPopup('<b>Da bist du! (Genauigkeit: ' + radius + 'm)</b><br>Erstelle <a href="{{ url_for('form') }}">hier</a> einen Eintrag').openPopup();
+				L.DomEvent.disableClickPropagation(container);
+	
+				container.title="Standort ermitteln";
 
-		L.circle(e.latlng, radius).addTo(mymap);
-		}
-		
-	mymap.on('locationfound', onLocationFound);
+				container.style.backgroundColor = 'white';
+				container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon.svg')}})"; 
+				container.style.backgroundSize = "30px 30px";
+				container.style.width = '33px';
+				container.style.height = '33px';
+			 
+ 
+ 
+			container.onmouseover = function(){
+				container.style.backgroundColor = '#F4F4F4'; 
+			}
 	
-	
-	
-		 mymap.on('click', 
-		 	function(e){
-				var coord = e.latlng.toString().split(',');
-				var lat = coord[0].split('(');
-		 		var lng = coord[1].split(')');
+			container.onmouseout = function(){
+				container.style.backgroundColor = 'white'; 
+			}
+			container.onclick = function(){
+				console.log('buttonClicked');
 				
-		 		//alert("You clicked the map at LAT: " + lat[1] + " and LONG: " + lng[0]);
-		 		var newMarker = L.marker(e.latlng, {draggable:'true'}).addTo(mymap)
+
 				
-				//.on('dragend', function() {
-			//var coord = String(myMarker.getLatLng()).split(',');
-			//})
+				
+				
+				mymap.locate({setView: true, maxZoom: 16});
+			  
+				function onLocationFound(e) {
+					var radius = e.accuracy / 2;
+					var coord = e.latlng.toString().split(',');
+					var lat = coord[0].split('(');
+					var lng = coord[1].split(')');
+					var latstring = lat.toString().slice(7,);
+					var lngstring = lng.toString().slice(1,-1);
+					
+					if (markers != 'undefined') {
+						mymap.removeLayer(markers);
+					};
+					if (circles != 'undefined') {
+						mymap.removeLayer(circles);
+					};
+				
+					markers =  L.marker(e.latlng); //, {draggable:'true'}
+					mymap.addLayer(markers);
+					markers.bindPopup('<b>Da bist du! (Genauigkeit: ' + radius + 'm)</b><br>Erstelle <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'">hier</a> einen Eintrag').openPopup();
+					
+					
+					circles =  L.circle(e.latlng, radius);
+					mymap.addLayer(circles);
+					
+				
+				};
+				
+			mymap.on('locationfound', onLocationFound);
+			};
 			
-				.bindPopup('<b>Da bist du?</b><br>Erstelle <a href="{{ url_for('form') }}">hier</a> einen Eintrag').openPopup();
-				
-				newMarker.on('dragend', function() {
-			var coord = String(newMarker.getLatLng()).split(',');
-			console.log(coord);
+		return container;
+		},
+	});
+	mymap.addControl(new myCustomControl());
+
+	<!-- set up click on map event to create a marker -->
+	mymap.on('click', 
+		function(e){
+			var coord = e.latlng.toString().split(',');
 			var lat = coord[0].split('(');
-			console.log(lat);
 			var lng = coord[1].split(')');
-			console.log(lng);
-			newMarker.bindPopup("Moved to: " + lat[1] + ", " + lng[0] + ".").openPopup();
-		});
+			var latstring = lat.toString().slice(7,);
+			var lngstring = lng.toString().slice(1,-1);
+			
+			if (markers != 'undefined') {
+				mymap.removeLayer(markers);
+			};
+			if (circles != 'undefined') {
+				mymap.removeLayer(circles);
+			};
+
+			markers = L.marker(e.latlng, {draggable:'true'});
+			mymap.addLayer(markers);
+			markers.bindPopup('<b>Da bist du!</b><br>Erstelle <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'">hier</a> einen Eintrag').openPopup();	
+
+			markers.on('dragend', function() {
+			var coord = String(markers.getLatLng()).split(',');
+			var lat = coord[0].split('(');	
+			var lng = coord[1].split(')');
+			
+			var latstring = lat.toString().slice(7,);
+			var lngstring = lng.toString().slice(1,-1);
+			
+			<!-- console.log(coord); -->
+			<!-- console.log(latstring); -->
+			<!-- console.log(lngstring); -->
+			
+			markers.bindPopup('Moved to: ' + latstring + ', ' + lngstring + '.<br>Erstelle <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'">hier</a> einen Eintrag').openPopup();
+			});			
+	});
+	
+
+
+
+
+	
+	
+	
+<!-- function showPosition(position) { -->
+				<!-- var radius = position.accuracy / 2; -->
+				<!-- var coord = String(position.getLatLng()).split(','); -->
+				<!-- console.log(coord); -->
+				<!-- var lat = coord[0].split('('); -->
+				<!-- console.log(lat); -->
+				<!-- var lng = coord[1].split(')'); -->
+				<!-- console.log(lng); -->
+				<!-- var setMarker = L.marker(position.latlng, {draggable:'true'}).addTo(mymap).bindPopup('<b>Da bist du?' +  lng +'</b><br>Erstelle <a href="{{ url_for('form') }}?latitude='+lat+'&longitude='+lng+'"> hier</a> einen Eintrag').openPopup(); -->
+				<!-- L.circle(position.latlng, radius).addTo(mymap);					 -->
+<!-- } -->
+
+
+
+
+	<!-- function showError(error) { -->
+		<!-- switch(error.code) { -->
+			<!-- case error.PERMISSION_DENIED: -->
+				<!-- location_info = "failed"; //"User denied the request for Geolocation." -->
+				<!-- break; -->
+			<!-- case error.POSITION_UNAVAILABLE: -->
+				<!-- location_info =  "failed"; //"Location information is unavailable." -->
+				<!-- break; -->
+			<!-- case error.TIMEOUT: -->
+				<!-- location_info = "failed"; //"The request to get user location timed out." -->
+				<!-- break; -->
+			<!-- case error.UNKNOWN_ERROR: -->
+				<!-- location_info = "failed"; //"An unknown error occurred." -->
+				<!-- break; -->
+		<!-- } -->
+	<!-- } -->
+
+
+
+
+
+
+
+
+	
+	<!-- var location_info = "granted"; -->
+	<!-- var mymap = L.map('mapid'); -->
+	<!-- var setMarker; -->
+	<!-- popupMessage = ""; -->
+	<!-- getLocation(); -->
+	
+	<!-- function getLocation() { -->
+		<!-- if (navigator.geolocation) { -->
+			<!-- navigator.geolocation.getCurrentPosition(showPosition, showError); -->
+			<!-- if (location_info == "granted") { -->
+				<!-- mymap.locate({setView: true, maxZoom: 16}); -->
+				<!-- L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', { -->
+					<!-- attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>', -->
+					<!-- id: 'mapbox.streets', -->
+					<!-- accessToken: 'your.mapbox.access.token'}).addTo(mymap); -->
+				<!-- setMarker.addTo(mymap).bindPopup("test").openPopup(); -->
+			<!-- } -->
+		
+			<!-- else { -->
+				<!-- var mymap = L.map('mapid').locate({setView: true, maxZoom: 2});//2 shows the world -->
+					<!-- L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', { -->
+					<!-- attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>', -->
+					<!-- id: 'mapbox.streets', -->
+					<!-- accessToken: 'your.mapbox.access.token'}).addTo(mymap); -->
+			<!-- } -->
+		<!-- } -->
+	<!-- } -->
+	
+	<!-- function showPosition(position) { -->
+				<!-- var radius = position.accuracy / 2; -->
+				<!-- var coord = String(position.getLatLng()).split(','); -->
+				<!-- console.log(coord); -->
+				<!-- var lat = coord[0].split('('); -->
+				<!-- console.log(lat); -->
+				<!-- var lng = coord[1].split(')'); -->
+				<!-- console.log(lng); -->
+				<!-- <!-- setMarker = L.marker(position.latlng, {draggable:'true'}); --> -->
+				<!-- <!-- popupMessage = '<b>Da bist du?' +  lng +'</b><br>Erstelle <a href="{{ url_for('form') }}?latitude='+lat+'&longitude='+lng+'"> hier</a> einen Eintrag'; --> -->
 				
-			});
+	<!-- } -->
+	
+	<!-- function showError(error) { -->
+		<!-- switch(error.code) { -->
+			<!-- case error.PERMISSION_DENIED: -->
+				<!-- location_info = "failed"; //"User denied the request for Geolocation." -->
+				<!-- break; -->
+			<!-- case error.POSITION_UNAVAILABLE: -->
+				<!-- location_info =  "failed"; //"Location information is unavailable." -->
+				<!-- break; -->
+			<!-- case error.TIMEOUT: -->
+				<!-- location_info = "failed"; //"The request to get user location timed out." -->
+				<!-- break; -->
+			<!-- case error.UNKNOWN_ERROR: -->
+				<!-- location_info = "failed"; //"An unknown error occurred." -->
+				<!-- break; -->
+		<!-- } -->
+	<!-- } -->
+		
+		
 
 		
-	</script>
-	
+</script>
+
 
 
 {% endblock map %}

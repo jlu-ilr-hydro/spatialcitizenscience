@@ -1,5 +1,7 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, session , jsonify, redirect
 import sys
+import random, json
+
 
 app = Flask(__name__)
 
@@ -31,9 +33,17 @@ def blog():
 def map():
     return render_template("map.html", posts=posts, title="map")
 
+    
+
 @app.route('/form')
 def form():
-    return render_template("form.html", posts=posts, title="form")
+    longitude = float(request.args.get('longitude'))
+    latitude = float(request.args.get('latitude'))
+##    longitude = request.args.get('longitude', type=float)
+##    latitude = request.args.get('latitude', type=float)
+    
+    return render_template("form.html", longitude=longitude, latitude=latitude, title="form")
+                   
 
 @app.route('/about')
 def about():
@@ -44,10 +54,10 @@ def about():
 @app.route('/login')
 def login():
     return render_template("about.html", posts=posts, title="About")
+
 @app.route('/register')
 def register():
     return render_template("about.html", posts=posts, title="About")
-
 
 
 if __name__ == "__main__":
