@@ -1,6 +1,6 @@
 from flask import Flask, render_template,  request
 
-from configuration import get_config
+from .configuration import get_config
 
 config = get_config()
 posts = [

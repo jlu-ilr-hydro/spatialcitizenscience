@@ -1,4 +1,4 @@
-from webinterface import app
+from .webinterface import app
 
 
 

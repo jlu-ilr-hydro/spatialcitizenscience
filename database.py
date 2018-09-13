@@ -1,5 +1,5 @@
 from sqlite3 import connect
-from configuration import get_config
+from .configuration import get_config
 
 
 def write_entry(lon: float, lat: float, length: float, width: float, depth:float, comment:str) -> int:
