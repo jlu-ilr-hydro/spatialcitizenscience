@@ -6,19 +6,21 @@
 	
 	<script type=text/javascript>
 	
-	
 	<!-- create empty Layers -->
 	var markers = {};
 	var circles = {};
 	
 	
 	<!-- create map object on load it -->
-	var mymap = L.map('mapid').setView([51.505, -0.09], 16);
+	var mymap = L.map('mapid').setView([51.1, 9,8], 6);
 				L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 				attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 				id: 'mapbox.streets',
 				accessToken: 'your.mapbox.access.token'}).addTo(mymap);
 				
+	<!-- set initial view extend -->
+	mymap.fitBounds([[47.4,5.8],[54.8,14.9]]);
+	
 	<!-- create control object -->
 	var myCustomControl = L.Control.extend({
 		options: {
@@ -37,9 +39,7 @@
 				container.style.backgroundSize = "30px 30px";
 				container.style.width = '33px';
 				container.style.height = '33px';
-			 
- 
- 
+
 			container.onmouseover = function(){
 				container.style.backgroundColor = '#F4F4F4'; 
 			}
@@ -47,11 +47,10 @@
 			container.onmouseout = function(){
 				container.style.backgroundColor = 'white'; 
 			}
+			
 			container.onclick = function(){
 				console.log('buttonClicked');
-				
-
-				
+				container.style.backgroundImage = "url({{ url_for( 'static', filename='images/loading.svg')}})";  
 				
 				
 				mymap.locate({setView: true, maxZoom: 16});
@@ -79,7 +78,9 @@
 					circles =  L.circle(e.latlng, radius);
 					mymap.addLayer(circles);
 					
-				
+					container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";  
+					
+	
 				};
 				
 			mymap.on('locationfound', onLocationFound);
@@ -125,114 +126,6 @@
 			markers.bindPopup('Moved to: ' + latstring + ', ' + lngstring + '.<br>Erstelle <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'">hier</a> einen Eintrag').openPopup();
 			});			
 	});
-	
-
-
-
-
-	
-	
-	
-<!-- function showPosition(position) { -->
-				<!-- var radius = position.accuracy / 2; -->
-				<!-- var coord = String(position.getLatLng()).split(','); -->
-				<!-- console.log(coord); -->
-				<!-- var lat = coord[0].split('('); -->
-				<!-- console.log(lat); -->
-				<!-- var lng = coord[1].split(')'); -->
-				<!-- console.log(lng); -->
-				<!-- var setMarker = L.marker(position.latlng, {draggable:'true'}).addTo(mymap).bindPopup('<b>Da bist du?' +  lng +'</b><br>Erstelle <a href="{{ url_for('form') }}?latitude='+lat+'&longitude='+lng+'"> hier</a> einen Eintrag').openPopup(); -->
-				<!-- L.circle(position.latlng, radius).addTo(mymap);					 -->
-<!-- } -->
-
-
-
-
-	<!-- function showError(error) { -->
-		<!-- switch(error.code) { -->
-			<!-- case error.PERMISSION_DENIED: -->
-				<!-- location_info = "failed"; //"User denied the request for Geolocation." -->
-				<!-- break; -->
-			<!-- case error.POSITION_UNAVAILABLE: -->
-				<!-- location_info =  "failed"; //"Location information is unavailable." -->
-				<!-- break; -->
-			<!-- case error.TIMEOUT: -->
-				<!-- location_info = "failed"; //"The request to get user location timed out." -->
-				<!-- break; -->
-			<!-- case error.UNKNOWN_ERROR: -->
-				<!-- location_info = "failed"; //"An unknown error occurred." -->
-				<!-- break; -->
-		<!-- } -->
-	<!-- } -->
-
-
-
-
-
-
-
-
-	
-	<!-- var location_info = "granted"; -->
-	<!-- var mymap = L.map('mapid'); -->
-	<!-- var setMarker; -->
-	<!-- popupMessage = ""; -->
-	<!-- getLocation(); -->
-	
-	<!-- function getLocation() { -->
-		<!-- if (navigator.geolocation) { -->
-			<!-- navigator.geolocation.getCurrentPosition(showPosition, showError); -->
-			<!-- if (location_info == "granted") { -->
-				<!-- mymap.locate({setView: true, maxZoom: 16}); -->
-				<!-- L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', { -->
-					<!-- attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>', -->
-					<!-- id: 'mapbox.streets', -->
-					<!-- accessToken: 'your.mapbox.access.token'}).addTo(mymap); -->
-				<!-- setMarker.addTo(mymap).bindPopup("test").openPopup(); -->
-			<!-- } -->
-		
-			<!-- else { -->
-				<!-- var mymap = L.map('mapid').locate({setView: true, maxZoom: 2});//2 shows the world -->
-					<!-- L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', { -->
-					<!-- attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>', -->
-					<!-- id: 'mapbox.streets', -->
-					<!-- accessToken: 'your.mapbox.access.token'}).addTo(mymap); -->
-			<!-- } -->
-		<!-- } -->
-	<!-- } -->
-	
-	<!-- function showPosition(position) { -->
-				<!-- var radius = position.accuracy / 2; -->
-				<!-- var coord = String(position.getLatLng()).split(','); -->
-				<!-- console.log(coord); -->
-				<!-- var lat = coord[0].split('('); -->
-				<!-- console.log(lat); -->
-				<!-- var lng = coord[1].split(')'); -->
-				<!-- console.log(lng); -->
-				<!-- <!-- setMarker = L.marker(position.latlng, {draggable:'true'}); --> -->
-				<!-- <!-- popupMessage = '<b>Da bist du?' +  lng +'</b><br>Erstelle <a href="{{ url_for('form') }}?latitude='+lat+'&longitude='+lng+'"> hier</a> einen Eintrag'; --> -->
-				
-	<!-- } -->
-	
-	<!-- function showError(error) { -->
-		<!-- switch(error.code) { -->
-			<!-- case error.PERMISSION_DENIED: -->
-				<!-- location_info = "failed"; //"User denied the request for Geolocation." -->
-				<!-- break; -->
-			<!-- case error.POSITION_UNAVAILABLE: -->
-				<!-- location_info =  "failed"; //"Location information is unavailable." -->
-				<!-- break; -->
-			<!-- case error.TIMEOUT: -->
-				<!-- location_info = "failed"; //"The request to get user location timed out." -->
-				<!-- break; -->
-			<!-- case error.UNKNOWN_ERROR: -->
-				<!-- location_info = "failed"; //"An unknown error occurred." -->
-				<!-- break; -->
-		<!-- } -->
-	<!-- } -->
-		
-		
-
 		
 </script>
 
