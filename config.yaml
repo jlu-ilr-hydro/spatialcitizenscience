@@ -1,0 +1,10 @@
+database:
+  filename: entries.sqlite
+  tablename: entries
+  fields:
+    - lat
+    - lon
+    - length
+    - depth
+
+name: max
