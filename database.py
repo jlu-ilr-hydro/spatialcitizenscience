@@ -54,18 +54,30 @@ class Connection:
             print('    ->', c.fetchall())
 
     def __enter__(self):
+        """
+        Helper function to use in a context:
+        >>> with Connection() as con:
+        >>>     pass
+        :return:
+        """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.__connection.close()
 
     def execute(self, cmd, args=()):
+        """
+        Executes a SQL command
+        :param cmd: The SQL command
+        :param args: the arguments of the SQL command
+        :return:
+        """
         return self.__connection.execute(cmd, args)
 
     def write_entry(self, **kwargs):
         """
         Writes an entry into the database
-        :param kwargs:
+        :param kwargs: A dictionary of fieldnames to new values
         :return:
         """
         values = [kwargs.get(f) for f in self.fieldnames]
@@ -82,9 +94,15 @@ class Connection:
             print('    ->', c.fetchall())
 
     def commit(self):
+        """
+        Commits a Database action
+        """
         self.__connection.commit()
 
     def count(self):
+        """
+        Returns the number of entries
+        """
         cmd = 'SELECT count(*) FROM ' + self.tablename
         if debug:
             print(cmd)
@@ -96,6 +114,11 @@ class Connection:
         return r[0]
 
     def read_entries(self, **kwargs):
+        """
+        Returns all database entries. Needs more work on the filter
+        :param kwargs: Filter, eg. id=10
+        :return:
+        """
         cmd = 'SELECT * FROM ' + self.tablename
         if kwargs:
             fields, values = zip(*kwargs.items())
