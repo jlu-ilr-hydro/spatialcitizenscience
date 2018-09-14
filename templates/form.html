@@ -1,39 +1,30 @@
 {% extends "layout.html" %}
 {% block content %}
 	<h3>Using CSS to style an HTML Form</h3>
+<p>{{ fields }}</p>
 
 <div class="form">
-  <form action="/action_page.php">
-  
-	<label for="longi">Longitude</label>
-    <input type="text" id="longi" name="longitude" value={{ longitude }}> 
-	
-	<label for="lati">Latitude</label>
-    <input type="text" id="lati" name="latitude" value={{ latitude }}>
-	
-    <label for="breite">Breite des Bodenrisses</label>
-    <input type="number" id="breite" name="breite_des_bodenrisses" placeholder="Breite..">
-	
-	<label for="länge">Länge des Bodenrisses</label>
-    <input type="number" id="länge" name="lreite_des_bodenrisses" placeholder="Länge..">
-	
-	<label for="tiefe">Tiefe des Bodenrisses</label>
-    <input type="number" id="tiefe" name="tiefe_des_bodenrisses" placeholder="Tiefe..">
-	
-    <label for="standorttyp">Standorttyp</label>
-    <select id="standorttyp" name="standorttyp">
-	
-      <option value="acker">Acker</option>
-      <option value="grünland">Grünland</option>
-      <option value="siedlungsfläche">Siedlungsfläche</option>
-	  <option value="wald">Wald</option>
-	  <option value="sonstige">Sonstige</option>
-    </select>
-	
-	 <label for="kommentar">Kommentar (max. 100 Zeichen)</label>
-    <input type="text" id="kommentar" name="kommentar" placeholder="Hinterlasse einen Kommentar..." maxlength=100>
-	
-    <input type="submit" value="Submit">
+  <form action="/save" method="post">
+    {% for field in fields %}
+        <label for="{{ field.name }}">{{ field.description }}</label>
+
+        {% if 'options' in field %}
+
+            <select id="{{ field.name }}"
+                    value="{{ values[field.name] }}"
+                    name="{{ field.name }}"
+            >
+                {% for option in field.options %}
+                    <option value="{{ option }}">{{ option }}</option>
+                {% endfor %}
+            </select>
+
+        {% else %}
+            <input type="{{ input_types[field.type] }}" id="{{ field.name }}"
+                   name="{{ field.name }}" value="{{ values[field.name] }}"/>
+        {% endif %}
+    {% endfor %}
+  <input type="submit" value="Absenden"/>
   </form>
 </div>
 {% endblock content %}

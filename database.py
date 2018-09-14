@@ -1,5 +1,5 @@
 import sqlite3
-from contextlib import contextmanager
+from datetime import datetime
 
 from configuration import get_config
 debug = False
@@ -12,15 +12,22 @@ python_to_sql_type = dict(
     datetime='TEXT'
 )
 
+str_to_python_type = dict(
+    str=str, int=int, float=float, bytes=bytes, datetime=datetime
+)
+
 
 class Connection:
-
+    """
+    Wraps a sqlite connection for use with the field definition model
+    """
     def __init__(self, config=None):
         config = config or get_config().database
         self.tablename = config.tablename
         self.__connection = sqlite3.connect(config.filename)
         self.fields = config.fields
         self.fieldnames = [f.name for f in self.fields]
+        self.create()
 
     def create(self):
         """
