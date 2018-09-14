@@ -2,10 +2,32 @@ database:
   filename: entries.sqlite
   tablename: entries
   fields:
-    - lat
-    - lon
-    - length
-    - depth
+    - name: lat
+      type: float
+      description: Grad geogr. Breite
+    - name: lon
+      type: float
+      description: Grad geogr. Länge
+    - name: length
+      type: float
+      description: Länge des Risses in cm
+    - name: width
+      type: float
+      description: Breite des Risses in cm
+    - name: depth
+      type: float
+      description: Tiefe des Risses in cm
+    - name: landuse
+      type: str
+      description: Landnutzung
+      options:
+        - Acker
+        - Grünland
+        - Nadelwald
+        - Laubwald
+        - Mischwald
+    - name: comment
+      type: str
+      description: Weitere Bemerkungen
 
 name: max
-name: philipp
