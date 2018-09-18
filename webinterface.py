@@ -59,6 +59,30 @@ def form():
                                  values=values, title="Eingabe", input_types=input_types)
 
 
+@app.route('/save', methods=['POST'])
+def save():
+    """
+    Saves the data from form to the database, accepts only POST data
+    """
+    db.debug = True
+    with db.Connection() as con:
+
+        # Translate the request.form dictionary (with strings)
+        # to a dictionary that maps from field name to the value of the correct type
+        # Uses db.str_to_python_type dictionary to create the right type
+        result = {}
+        for f in con.fields:
+            if f.name in flask.request.form:
+                result[f.name] = db.str_to_python_type[f.type](flask.request.form.get(f.name))
+
+        # Write the result into the database
+        con.write_entry(**result)
+        con.commit()
+
+    db.debug = False
+    # Return to map
+    return flask.redirect(flask.url_for('map'))
+
 
 @app.route('/about')
 def about():
