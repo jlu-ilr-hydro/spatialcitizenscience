@@ -21,7 +21,7 @@ def render_markdown(filename, title=None):
     return flask.render_template('markdown.html', markdown_content=text, title=title)
 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def mainpage():
     """
     Returns main.md
@@ -31,17 +31,17 @@ def mainpage():
     return render_markdown(config.content.main)
 
 
-@app.route('/blog')
+@app.route('/blog', methods=['GET'])
 def blog():
     return render_markdown('main.md')
 
 
-@app.route('/map')
+@app.route('/map', methods=['GET'])
 def map():
     return flask.render_template("map.html", title="map")
 
 
-@app.route('/form')
+@app.route('/form', methods=['GET'])
 def form():
     """
     Displays the data entry form. The data entry form uses the config.database.fields to show the entries
@@ -68,7 +68,7 @@ def save():
     Saves the data from form to the database, accepts only POST data
     """
     db.debug = True
-    with db.Connection() as con:
+    with db.Connection(app.root_path) as con:
 
         # Translate the request.form dictionary (with strings)
         # to a dictionary that maps from field name to the value of the correct type
@@ -87,18 +87,18 @@ def save():
     return flask.redirect(flask.url_for('map'))
 
 
-@app.route('/about')
+@app.route('/about', methods=['GET'])
 def about():
     return flask.render_template("about.html", title="About")
 
 
-@app.route('/sites.geojson')
+@app.route('/sites.geojson', methods=['GET'])
 def sites_geojson():
     """
     Returns all sites as geojson objects
     :return:
     """
 
-    with db.Connection() as con:
+    with db.Connection(app.root_path) as con:
         return flask.jsonify(list(con.features()))
 
