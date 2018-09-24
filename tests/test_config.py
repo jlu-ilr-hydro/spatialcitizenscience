@@ -1,7 +1,7 @@
 import unittest
-import database as db
 import random
-from configuration import get_config, home
+import spatialcitizenscience.database as db
+from spatialcitizenscience.configuration import get_config, home
 
 
 class TestConfig(unittest.TestCase):
@@ -11,9 +11,7 @@ class TestConfig(unittest.TestCase):
     def test_config_entry(self):
         config = get_config()
         self.assert_('database' in config)
-        db_conf = config.database
-        self.assertEqual(db_conf.filename, 'entries.sqlite')
-        self.assertEqual(db_conf.tablename, 'entries')
+        self.assert_('content' in config)
 
 
 def make_entry(config):
@@ -27,13 +25,13 @@ class TestDb(unittest.TestCase):
     def test_init_db(self):
         config = get_config()
         config.database.filename = ':memory:'
-        with db.Connection(config.database) as con:
+        with db.Connection('', config.database) as con:
             con.create()
 
     def test_write_db(self):
         config = get_config()
         config.database.filename = ':memory:'
-        with db.Connection(config.database) as con:
+        with db.Connection('', config.database) as con:
             con.create()
             entry = make_entry(config.database)
             con.write_entry(**entry)
@@ -43,7 +41,7 @@ class TestDb(unittest.TestCase):
     def test_read_db(self):
         config = get_config()
         config.database.filename = ':memory:'
-        with db.Connection(config.database) as con:
+        with db.Connection('', config.database) as con:
             con.create()
             for i in range(100):
                 entry = make_entry(config.database)
