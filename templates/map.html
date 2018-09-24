@@ -10,51 +10,53 @@
 	var markers = {};
 	var circles = {};
 	
-	
 	<!-- create map object on load it -->
 	var mymap = L.map('mapid').setView([51.1, 9.8], 6);
-				L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-				attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-				id: 'mapbox.streets',
-				accessToken: 'your.mapbox.access.token'}).addTo(mymap);
-				
+    L.tileLayer(
+        'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
+    {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox.streets',
+        accessToken: 'your.mapbox.access.token'
+    }).addTo(mymap);
+
 	<!-- set initial view extend -->
 	mymap.fitBounds([[47.4,5.8],[54.8,14.9]]);
-	
+
 	<!-- create control object -->
 	var myCustomControl = L.Control.extend({
 		options: {
-			position: 'topleft' 
+			position: 'topleft'
 			//control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
 			},
 		onAdd: function (mymap) {
 			var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-			
+
 				L.DomEvent.disableClickPropagation(container);
-	
+
 				container.title="Standort ermitteln";
 
 				container.style.backgroundColor = 'white';
-				container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon.svg')}})"; 
+				container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon.svg')}})";
 				container.style.backgroundSize = "30px 30px";
 				container.style.width = '33px';
 				container.style.height = '33px';
 
 			container.onmouseover = function(){
-				container.style.backgroundColor = '#F4F4F4'; 
+				container.style.backgroundColor = '#F4F4F4';
 			}
-	
+
 			container.onmouseout = function(){
-				container.style.backgroundColor = 'white'; 
+				container.style.backgroundColor = 'white';
 			}
-			
+
 			container.onclick = function(){
 				console.log('buttonClicked');
-				container.style.backgroundImage = "url({{ url_for( 'static', filename='images/loading.svg')}})";  
-				
-				
+				container.style.backgroundImage = "url({{ url_for( 'static', filename='images/loading.svg')}})";
+
+
 				mymap.locate({setView: true, maxZoom: 16});
-			  
+
 				function onLocationFound(e) {
 					var radius = e.accuracy / 2;
 					var coord = e.latlng.toString().split(',');
@@ -62,37 +64,37 @@
 					var lng = coord[1].split(')');
 					var latstring = lat.toString().slice(7,);
 					var lngstring = lng.toString().slice(1,-1);
-					
+
 					if (markers != 'undefined') {
 						mymap.removeLayer(markers);
 					};
 					if (circles != 'undefined') {
 						mymap.removeLayer(circles);
 					};
-				
+
 					markers =  L.marker(e.latlng); //, {draggable:'true'}
 					mymap.addLayer(markers);
 					markers.bindPopup('<b>Da bist du! (Genauigkeit: ' + radius + 'm)</b><br>Erstelle <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'">hier</a> einen Eintrag').openPopup();
-					
-					
+
+
 					circles =  L.circle(e.latlng, radius);
 					mymap.addLayer(circles);
-					
-					container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";  
-					
-	
+
+					container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";
+
+
 				};
-				
+
 			mymap.on('locationfound', onLocationFound);
 			};
-			
+
 		return container;
 		},
 	});
 	mymap.addControl(new myCustomControl());
 
 	<!-- set up click on map event to create a marker -->
-	mymap.on('click', 
+	mymap.on('click',
 		function(e){
 			var coord = e.latlng.toString().split(',');
 			var lat = coord[0].split('(');

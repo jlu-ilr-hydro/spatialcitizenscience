@@ -50,11 +50,10 @@ class TestDb(unittest.TestCase):
                 con.write_entry(**entry)
             con.commit()
             self.assertEqual(con.count(), 100)
-            result = con.read_entries()
-            print(result[-1])
+            result = list(con.read_entries())
             self.assertEqual(len(result), 100)
             self.assertCountEqual([r[0] for r in result], range(1, 101))
-            result = con.read_entries(id=10)
+            result = list(con.read_entries(id=10))
             self.assertEqual(len(result), 1, 'Filtered for id=10 but got too many results (or None)')
 
 

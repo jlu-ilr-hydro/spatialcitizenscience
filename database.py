@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-
+import geojson
 from configuration import get_config
 debug = False
 
@@ -15,6 +15,7 @@ python_to_sql_type = dict(
 str_to_python_type = dict(
     str=str, int=int, float=float, bytes=bytes, datetime=datetime
 )
+
 
 
 class Connection:
@@ -132,5 +133,19 @@ class Connection:
             print(cmd)
 
         c = self.execute(cmd, values)
-        return c.fetchall()
+        for row in c:
+            yield row
+
+    def features(self):
+        def make_feature_from_row(row):
+            p = geojson.Point(row[1:3])
+            props = {fieldname: value
+                     for fieldname, value in
+                     zip(['id'] + self.fieldnames, row)
+                     }
+            f = geojson.Feature(row[0], p, properties=props)
+            return f
+
+        for row in self.read_entries():
+            yield make_feature_from_row(row)
 

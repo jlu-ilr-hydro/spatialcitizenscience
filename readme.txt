@@ -19,4 +19,6 @@ http://127.0.0.1:5000
 This is the default localhost but check in the cmd output if the webapp was started under this ip.
 
 
-
+TODO:
+https://leafletjs.com/examples/geojson/
+https://leafletjs.com/examples/choropleth/

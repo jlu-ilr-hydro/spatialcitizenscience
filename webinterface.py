@@ -1,5 +1,7 @@
 import flask as flask
 import markdown
+import geojson
+
 from .configuration import get_config, to_yaml
 from . import database as db
 
@@ -25,7 +27,8 @@ def mainpage():
     Returns main.md
     :return:
     """
-    return render_markdown("main.md")
+    config = get_config()
+    return render_markdown(config.content.main)
 
 
 @app.route('/blog')
@@ -88,4 +91,14 @@ def save():
 def about():
     return flask.render_template("about.html", title="About")
 
+
+@app.route('/sites.geojson')
+def sites_geojson():
+    """
+    Returns all sites as geojson objects
+    :return:
+    """
+
+    with db.Connection() as con:
+        return flask.jsonify(list(con.features()))
 
