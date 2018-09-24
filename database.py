@@ -1,7 +1,10 @@
 import sqlite3
 from datetime import datetime
 import geojson
+import os
 from configuration import get_config
+
+
 debug = False
 
 python_to_sql_type = dict(
@@ -22,10 +25,10 @@ class Connection:
     """
     Wraps a sqlite connection for use with the field definition model
     """
-    def __init__(self, config=None):
+    def __init__(self, path, config=None):
         config = config or get_config().database
         self.tablename = config.tablename
-        self.__connection = sqlite3.connect(config.filename)
+        self.__connection = sqlite3.connect(os.path.join(path, config.filename))
         self.fields = config.fields
         self.fieldnames = [f.name for f in self.fields]
         self.create()
