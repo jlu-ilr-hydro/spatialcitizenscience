@@ -30,4 +30,6 @@ database:
       type: str
       description: Weitere Bemerkungen
 
-name: max
+content:
+    main: markdown/main.md
+    about: markdown/main.md
