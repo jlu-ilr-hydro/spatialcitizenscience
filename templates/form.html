@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="form">
-  <form action="/save" method="post">
+  <form action="save" method="post">
     {% for field in fields %}
         <label for="{{ field.name }}">{{ field.description }}</label>
 

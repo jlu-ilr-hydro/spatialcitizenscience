@@ -31,5 +31,5 @@ database:
       description: Weitere Bemerkungen
 
 content:
-    main: markdown/main.md
-    about: markdown/main.md
+    main: main.md
+    about: main.md
