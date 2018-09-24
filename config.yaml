@@ -1,5 +1,5 @@
 database:
-  filename: entries.sqlite
+  filename: data/entries.sqlite
   tablename: entries
   fields:
     - name: lat
