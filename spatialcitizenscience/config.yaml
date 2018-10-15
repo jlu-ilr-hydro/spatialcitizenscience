@@ -33,3 +33,8 @@ database:
 content:
     main: main.md
     about: main.md
+
+map:
+  longitude: 51.1
+  latitude: 9.8
+  zoomlevel: 6
