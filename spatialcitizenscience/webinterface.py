@@ -38,7 +38,7 @@ def blog():
 
 @app.route('/map', methods=['GET'])
 def map():
-    return flask.render_template("map.html", title="map")
+    return flask.render_template("map.html", title="map", showsites=False)
 
 
 @app.route('/form', methods=['GET'])
@@ -102,3 +102,6 @@ def sites_geojson():
     with db.Connection(app.root_path) as con:
         return flask.jsonify(list(con.features()))
 
+@app.route('/sites.map', methods=['GET'])
+def sites_map():
+    return flask.render_template("map.html", title="map", showsites=True)
