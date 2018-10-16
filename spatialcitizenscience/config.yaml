@@ -38,3 +38,10 @@ map:
   longitude: 51.1
   latitude: 9.8
   zoomlevel: 6
+  location_btn: Standort ermitteln
+  location_msg:
+    show_precision: 1
+    first_line: Da bist du!
+    second_line_pt1: Erstelle
+    second_line_pt2: einen Eintrag.
+    link_string: hier
