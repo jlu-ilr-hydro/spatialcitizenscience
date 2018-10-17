@@ -71,12 +71,7 @@
 					markers =  L.marker(e.latlng); //, {draggable:'true'}
 					mymap.addLayer(markers);
 
-					if ({{ map.location_msg.show_precision }} === 1) {
-					    markers.bindPopup('<b>{{ map.location_msg.first_line }} (Genauigkeit: ' + radius + 'm)</b><br>{{ map.location_msg.second_line_pt1 }}<a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
-                    } else {
-                         markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
-
-                    }
+					setMarker(latstring, lngstring, r=radius);
 
 					circles =  L.circle(e.latlng, radius);
 					mymap.addLayer(circles);
@@ -108,19 +103,35 @@
 
 			markers = L.marker(e.latlng, {draggable:'true'});
 			mymap.addLayer(markers);
-			markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+
+			setMarker(latstring, lngstring);
 
 			markers.on('dragend', function() {
-			var coord = String(markers.getLatLng()).split(',');
-			var lat = coord[0].split('(');	
-			var lng = coord[1].split(')');
-			
-			var latstring = lat.toString().slice(7,);
-			var lngstring = lng.toString().slice(1,-1);
-
-			markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
-			});			
+			    getCoordinates();
+			});
 	});
+
+
+	function setMarker(lat, lng, r=0) {
+
+	    if ({{ map.location_msg.show_precision }} === 1 && r !== 0){
+            return markers.bindPopup('<b>{{ map.location_msg.first_line }} (Genauigkeit: ' + r + 'm)</b><br>{{ map.location_msg.second_line_pt1 }}<a href="{{ url_for('form') }}?latitude='+lat+'&longitude='+lng+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+        } else if (r !==0) {
+            return markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude=' + lat + '&longitude=' + lng + '"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+        } else {
+	        return markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+lat+'&longitude='+lng+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+        }
+    }
+    function getCoordinates() {
+        var coord = String(markers.getLatLng()).split(',');
+        var lat = coord[0].split('(');
+        var lng = coord[1].split(')');
+
+        var latstring = lat.toString().slice(7,);
+        var lngstring = lng.toString().slice(1, -1);
+
+        setMarker(latstring, lngstring);
+    }
 </script>
 
 {% endblock map %}

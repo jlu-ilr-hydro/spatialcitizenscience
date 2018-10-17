@@ -35,6 +35,7 @@ content:
     about: main.md
 
 map:
+  autolocation: 0
   longitude: 51.1
   latitude: 9.8
   zoomlevel: 6
