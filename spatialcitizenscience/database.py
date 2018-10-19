@@ -19,6 +19,30 @@ str_to_python_type = dict(
     str=str, int=int, float=float, bytes=bytes, datetime=datetime
 )
 
+class Entry:
+
+    def __init__(self, fieldnames, *values):
+        self._fieldnames = ['id'] + list(fieldnames)
+        self._values = list(values)
+
+    def __dir__(self):
+        return self._fieldnames
+
+    def __getattr__(self, item):
+        if item in self._fieldnames:
+            return self._values[self._fieldnames.index(item)]
+        else:
+            raise AttributeError(f'This entry has no field {item}')
+
+    def __getitem__(self, item):
+        if item in self._fieldnames:
+            return self._values[self._fieldnames.index(item)]
+        elif item in range(len(self._values)):
+            return self._values[item]
+        else:
+            raise IndexError(f'This entry has no field or item position {item}')
+
+
 
 
 class Connection:
@@ -137,11 +161,11 @@ class Connection:
 
         c = self.execute(cmd, values)
         for row in c:
-            yield row
+            yield Entry(self.fieldnames, *row)
 
     def features(self):
         def make_feature_from_row(row):
-            p = geojson.Point(row[1:3])
+            p = geojson.Point([row.lon, row.lat])
             props = {fieldname: value
                      for fieldname, value in
                      zip(['id'] + self.fieldnames, row)
