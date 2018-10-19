@@ -3,9 +3,38 @@
     <div id="mapid"></div>
 
     <div id="icon"></div>
-
+    <style>
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+    </style>
     <script type=text/javascript>
-
+        function colorForValue(upper_limits, colors, value) {
+            if (value === undefined) {
+                return ['#000000', 'undefined'];
+            }
+            for (var i=0; i<upper_limits.length; i++) {
+                let text = '';
+                if (value < upper_limits[i]) {
+                    if (i === 0) {
+                        text = '&lt; '  + upper_limits[i].toPrecision(4);
+                    } else {
+                        text = upper_limits[i - 1].toPrecision(4) + ' - &lt; ' + upper_limits[i].toPrecision(4);
+                    }
+                    return [colors[i], text];
+                }
+            }
+            return [colors[i-1], '&gt; '  + upper_limits[i-1].toPrecision(4)];
+        }
         <!-- create empty Layers -->
         var markers = {};
         var circles = {};
@@ -21,7 +50,7 @@
             }).addTo(mymap);
 
         <!--  create control object -->
-        var myCustomControl = L.Control.extend({
+        var LocationButton = L.Control.extend({
             options: {
                 position: 'topleft'
                 //control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
@@ -84,7 +113,7 @@
                         mymap.addLayer(circles);
 
                         container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";
-};
+                };
 
 
 
@@ -94,8 +123,9 @@
                 return container;
             },
         });
-        mymap.addControl(new myCustomControl());
+        mymap.addControl(new LocationButton());
 
+        {%  if not showsites %}
         <!-- set up click on map event to create a marker -->
         mymap.on('click',
             function(e){
@@ -129,20 +159,88 @@
                     markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
 
             });
-});
-        {% if showsites %}
+        });
+        {% elif showsites %}
+        // Load data from server
+            let legend = {
+                colors: ['#ffffcc','#a1dab4','#41b6c4','#225ea8'],
+                limits: [2, 4, 8],
+                get_color: function(value) {
+                    if (value == undefined) {
+                        return 'white';
+                    }
+                    for (var i=0; i<this.limits.length; i++) {
+                        if (value < this.limits[i])
+                            return this.colors[i];
+                    }
+                    return this.colors[i];
+                }
+            };
+            var geojson;
         $.getJSON('sites.geojson', {},
             function(data) {
-                console.log('Got ' + data.length + ' sites');
-                L.geoJSON(data, {
-                    pointToLayer: function (feature, latlng) {
-                        console.log(latlng);
-                        return L.marker(latlng);
+                console.log(data);
+                geojson = L.geoJSON(data, {
+                    onEachFeature: function(feature, layer) {
+                        layer.on({
+                            mouseover: function(e) {
+                                e.target.setStyle({
+                                    weight: 5,
+                                    color: '#666',
+                                    dashArray: '',
+                                    fillOpacity: 0.7
+                                });
+                                info.update(layer.feature.properties);
+                            },
+                            mouseout: function(e) {
+                                geojson.resetStyle(e.target);
+                                info.update();
+                            },
+                            click: function(e) {
+                                mymap.setView(e.target.feature.coordinates, mymap.getZoom() + 2);
+                            }
+                        });
+                    },
+                    pointToLayer: function(feature, latlng) {
+                        var marker = L.circleMarker(latlng,
+                            {
+                                radius: 8,
+                                fillColor: legend.get_color(feature.properties.length),
+                                color: "#000",
+                                weight: 1,
+                                opacity: 1,
+                                fillOpacity: 0.8
+                        });
+                        console.log(marker);
+                        return marker;
                     }
                 }).addTo(mymap);
 
              }
         );
+        // Make info control
+        var info = L.control();
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+            this.update();
+            return this._div;
+        };
+
+        // method that we will use to update the control based on feature properties passed
+        info.update = function (props) {
+            let text = '<h4> Bodenriss </h4>';
+            if (props) {
+                text += '<ul>';
+                for (let propname in props) {
+                    text += '<li>' + propname + ': ' + props[propname] + '</li>';
+                }
+                text += '</ul>';
+            }
+            this._div.innerHTML = text;
+        };
+
+        info.addTo(mymap);
         {% endif %}
 
 
