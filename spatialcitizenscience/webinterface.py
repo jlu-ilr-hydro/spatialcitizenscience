@@ -38,7 +38,8 @@ def blog():
 
 @app.route('/map', methods=['GET'])
 def map():
-    return flask.render_template("map.html", title="map", showsites=False)
+    map_config = get_config().map
+    return flask.render_template("map.html", title="map", map=map_config, showsites=False)
 
 
 @app.route('/form', methods=['GET'])
@@ -104,4 +105,5 @@ def sites_geojson():
 
 @app.route('/sites.map', methods=['GET'])
 def sites_map():
-    return flask.render_template("map.html", title="map", showsites=True)
+    map_config = get_config().map
+    return flask.render_template("map.html", title="map", map=map_config, showsites=True)
