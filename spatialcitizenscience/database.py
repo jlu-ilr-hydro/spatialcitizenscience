@@ -19,6 +19,7 @@ str_to_python_type = dict(
     str=str, int=int, float=float, bytes=bytes, datetime=datetime
 )
 
+
 class Entry:
 
     def __init__(self, fieldnames, *values):

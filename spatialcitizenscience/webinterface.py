@@ -1,11 +1,26 @@
 import flask as flask
 import markdown
-import geojson
-
+import bleach
 from .configuration import get_config, to_yaml
 from . import database as db
 
 app = flask.Flask(__name__)
+
+
+def clean(text: str):
+
+    return flask.Markup(
+        bleach.clean(
+            text,
+            bleach.ALLOWED_TAGS + ['sub', 'sup'],
+            ['class']
+        )
+    )
+
+
+def render(template, title=None, **kwargs):
+    config = get_config()
+    return flask.render_template(template, title=clean(title or config.title), **kwargs, config=config, clean=clean)
 
 
 def render_markdown(filename, title=None):
@@ -18,28 +33,23 @@ def render_markdown(filename, title=None):
         text = f.read()
     text = markdown.markdown(text.decode())
     text = flask.Markup(text)
-    return flask.render_template('markdown.html', markdown_content=text, title=title)
+    return render('markdown.html', markdown_content=text, title=title)
 
 
 @app.route('/', methods=['GET'])
-def mainpage():
+def index():
     """
     Returns main.md
     :return:
     """
     config = get_config()
-    return render_markdown(config.content.main)
-
-
-@app.route('/blog', methods=['GET'])
-def blog():
-    return render_markdown('main.md')
+    return render_markdown(config.content.index.text)
 
 
 @app.route('/map', methods=['GET'])
 def map():
     map_config = get_config().map
-    return flask.render_template("map.html", title="map", map=map_config, showsites=False)
+    return render("map.html", title="map", map=map_config, showsites=False)
 
 
 @app.route('/form', methods=['GET'])
@@ -90,7 +100,7 @@ def save():
 
 @app.route('/about', methods=['GET'])
 def about():
-    return flask.render_template("about.html", title="About")
+    return render_markdown('about.md', 'Über')
 
 
 @app.route('/sites.geojson', methods=['GET'])
@@ -101,9 +111,34 @@ def sites_geojson():
     """
 
     with db.Connection(app.root_path) as con:
-        return flask.jsonify(list(con.features()))
+        features = con.features()
+        features = list(features)
+        return flask.jsonify(features)
+
+
+@app.route('/sites.csv', methods=['GET'])
+def sites_csv():
+    """
+    Returns all sites as geojson objects
+    :return:
+    """
+    import io
+    import csv
+
+    dest = io.StringIO()
+    dest.write('\ufeff')
+    writer = csv.writer(dest, quoting=csv.QUOTE_MINIMAL)
+
+    with db.Connection(app.root_path) as con:
+        writer.writerow(con.fieldnames)
+        writer.writerows(con.read_entries())
+    output = flask.make_response(dest.getvalue())
+    output.headers["Content-Disposition"] = "attachment; filename=spatialcitizenscience.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
+
 
 @app.route('/sites.map', methods=['GET'])
 def sites_map():
     map_config = get_config().map
-    return flask.render_template("map.html", title="map", map=map_config, showsites=True)
+    return flask.render_template("map.html", title=map.title, map=map_config, showsites=True)

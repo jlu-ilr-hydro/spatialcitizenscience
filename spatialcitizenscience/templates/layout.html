@@ -5,7 +5,7 @@
 	<!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename=config.favicon) }}">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
@@ -14,10 +14,9 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form.css') }}"/>
 	
 	<!-- Leaflet  CSS -->
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
-	<!-- Leaflet  CSS locate icon--> 
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-	<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" /> -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
 
 	<!-- social media share  CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -29,8 +28,9 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	
 	 <!-- Make sure you put this AFTER Leaflet's CSS -->
-	<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
-	<!-- <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script> -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
 	
 	{% if title %}
 		<title>{{ title }}</title>
@@ -44,16 +44,16 @@
 	<header class="site-header">
 	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
 		<div class="container">
-		  <a class="navbar-brand mr-4" href=".">Soilcracks</a>
+		  <a class="navbar-brand mr-4" href=".">{{ clean(config.title) }}</a>
 			  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			  </button>
 		  <div class="collapse navbar-collapse" id="navbarToggle">
 			<div class="navbar-nav mr-auto">
-			  <a class="nav-item nav-link" href="{{ url_for('map') }}">Map</a>
-			  <a class="nav-item nav-link" href="{{ url_for('blog') }}">Blog</a>
-			  <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
-			  	
+                {% for page in config.content %}
+	    		  <a class="nav-item nav-link" href="{{ url_for(page) }}">{{ clean(config.content[page].title) }}</a>
+                {% endfor %}
+                <a class="nav-item nav-link" href="{{ url_for('map') }}">{{ clean(config.map.title) }}</a>
 			</div>
 		  </div>
 		</div>
@@ -76,8 +76,7 @@
       <div class="container">
         <span> 
 		<ul>
-			<li>© 2018 Copyright: <a href="https://mdbootstrap.com/bootstrap-tutorial/"> bla,</a></li>
-			<li><a href="/">Impressum</a></li>
+			<li><a href="{{ url_for('about') }}">Impressum</a></li>
 		</ul>
 
 		
@@ -85,12 +84,5 @@
       </div>
     </footer>
   <!-- Footer -->
-  
-  
-  
-  
-
-
-	
  </body>
 </html>

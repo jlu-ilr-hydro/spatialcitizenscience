@@ -1,3 +1,5 @@
+title: "Öko-Feldtage: NO<sub>3</sub>"
+favicon: images/favicon.ico
 database:
   filename: data/entries.sqlite
   tablename: entries
@@ -31,10 +33,14 @@ database:
       description: Weitere Bemerkungen
 
 content:
-    main: main.md
-    about: main.md
-
+  index:
+    title: '&#x2302;'
+    text: main.md
+  about:
+    title: Impressum
+    text: about.md
 map:
+  title: Karte
   longitude: 51.1
   latitude: 9.8
   zoomlevel: 6
@@ -45,3 +51,4 @@ map:
     second_line_pt1: Erstelle
     second_line_pt2: einen Eintrag.
     link_string: hier
+  access_token: pk.eyJ1IjoicGhpbGlwcGtyYWZ0IiwiYSI6ImNreXNqY3FyZjBuNm4yb3FhM2VmcjdxbXAifQ._zY1PN80gUpqEPe_3ZnYrA
