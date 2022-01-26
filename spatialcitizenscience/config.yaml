@@ -1,24 +1,37 @@
 title: "Öko-Feldtage: NO<sub>3</sub>"
 favicon: images/favicon.ico
 database:
-  filename: data/entries.sqlite
+  filename: data/nitrate.sqlite
   tablename: entries
   fields:
     - name: lat
       type: float
       description: Grad geogr. Breite
+      notnull: true
     - name: lon
       type: float
       description: Grad geogr. Länge
-    - name: length
+      notnull: true
+    - name: time
+      type: datetime
+      description: Datum / Uhrzeit
+      notnull: true
+    - name: samplename
+      type: str
+      description: Probenbezeichnung
+      notnull: true
+    - name: nitrate
       type: float
-      description: Länge des Risses in cm
-    - name: width
-      type: float
-      description: Breite des Risses in cm
-    - name: depth
-      type: float
-      description: Tiefe des Risses in cm
+      description: Konzentration von NO3-N in mg/l
+    - name: watersource
+      type: str
+      description: Art des Gewässers
+      options:
+        - Fluss / Bach
+        - See / Teich
+        - Quelle
+        - Grundwasser
+        - Leitungswasser
     - name: landuse
       type: str
       description: Landnutzung
@@ -28,6 +41,7 @@ database:
         - Nadelwald
         - Laubwald
         - Mischwald
+
     - name: comment
       type: str
       description: Weitere Bemerkungen

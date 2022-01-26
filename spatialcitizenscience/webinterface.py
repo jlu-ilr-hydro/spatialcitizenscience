@@ -3,13 +3,9 @@ import markdown
 import bleach
 from .configuration import Config
 from . import database as db
-
-from flask_wtf import FlaskForm
-import wtforms as wtf
+from . import form
 
 app = flask.Flask(__name__)
-
-
 def clean(text: str):
 
     return flask.Markup(
@@ -59,27 +55,16 @@ def map():
         return render("map.html", title="map", map=config.map, showsites=False)
 
 
-
-
 @app.route('/form', methods=['GET'])
 def form():
     """
     Displays the data entry form. The data entry form uses the config.database.fields to show the entries
     """
-
-    # Get values from a GET URL
-    values = dict(
-        lon=flask.request.args.get('longitude', ''),
-        lat=flask.request.args.get('latitude', '')
-    )
-
     with Config() as config:
+        F = form.create_form_type(config.database.fields, use_flask_wtf=True)
+        f = F(flask.request)
 
-        # Helper dictionary to map the field.type value to a HTML input type
-        input_types = dict(float='number', int='number', str='text', datetime='date', bytes='file')
-
-    return flask.render_template("form.html", fields=config.database.fields,
-                                 values=values, title="Eingabe", input_types=input_types)
+    return render("form.html", form=f, title="Eingabe")
 
 
 @app.route('/save', methods=['POST'])

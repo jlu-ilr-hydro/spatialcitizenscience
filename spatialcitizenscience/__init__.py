@@ -1,4 +1,6 @@
 from .webinterface import app
+from .configuration import Config
+
 import os
 
 if __name__ == "__main__":

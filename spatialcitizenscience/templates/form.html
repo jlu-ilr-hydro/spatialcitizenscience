@@ -3,24 +3,9 @@
 
 <div class="form">
   <form action="save" method="post">
-    {% for field in fields %}
-        <label for="{{ field.name }}">{{ field.description }}</label>
-
-        {% if 'options' in field %}
-
-            <select id="{{ field.name }}"
-                    value="{{ values[field.name] }}"
-                    name="{{ field.name }}"
-            >
-                {% for option in field.options %}
-                    <option value="{{ option }}">{{ option }}</option>
-                {% endfor %}
-            </select>
-
-        {% else %}
-            <input type="{{ input_types[field.type] }}" id="{{ field.name }}"
-                   name="{{ field.name }}" value="{{ values[field.name] }}"/>
-        {% endif %}
+    {% for field in form %}
+        {{ field.label }}
+        {{ field(class_='form-control') }}
     {% endfor %}
   <input type="submit" value="Absenden"/>
   </form>
