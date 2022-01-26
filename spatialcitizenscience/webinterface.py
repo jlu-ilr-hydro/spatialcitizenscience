@@ -1,8 +1,11 @@
 import flask as flask
 import markdown
 import bleach
-from .configuration import get_config, to_yaml
+from .configuration import Config
 from . import database as db
+
+from flask_wtf import FlaskForm
+import wtforms as wtf
 
 app = flask.Flask(__name__)
 
@@ -19,8 +22,12 @@ def clean(text: str):
 
 
 def render(template, title=None, **kwargs):
-    config = get_config()
-    return flask.render_template(template, title=clean(title or config.title), **kwargs, config=config, clean=clean)
+    with Config() as config:
+        return flask.render_template(
+            template, title=clean(title or config['title']),
+            **kwargs,
+            config=config, clean=clean
+        )
 
 
 def render_markdown(filename, title=None):
@@ -42,14 +49,16 @@ def index():
     Returns main.md
     :return:
     """
-    config = get_config()
-    return render_markdown(config.content.index.text)
+    with Config() as config:
+        return render_markdown(config.content.index.text)
 
 
 @app.route('/map', methods=['GET'])
 def map():
-    map_config = get_config().map
-    return render("map.html", title="map", map=map_config, showsites=False)
+    with Config() as config:
+        return render("map.html", title="map", map=config.map, showsites=False)
+
+
 
 
 @app.route('/form', methods=['GET'])
@@ -64,10 +73,10 @@ def form():
         lat=flask.request.args.get('latitude', '')
     )
 
-    config = get_config()
+    with Config() as config:
 
-    # Helper dictionary to map the field.type value to a HTML input type
-    input_types = dict(float='number', int='number', str='text', datetime='date', bytes='file')
+        # Helper dictionary to map the field.type value to a HTML input type
+        input_types = dict(float='number', int='number', str='text', datetime='date', bytes='file')
 
     return flask.render_template("form.html", fields=config.database.fields,
                                  values=values, title="Eingabe", input_types=input_types)

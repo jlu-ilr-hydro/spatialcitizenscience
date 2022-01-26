@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 import geojson
-from .configuration import get_config
+# from .configuration import get_config
 import os
 
 
