@@ -40,7 +40,7 @@
         var circles = {};
 
         <!-- create map object on load it -->
-        var mymap = L.map('mapid').setView([{{ map.longitude }}, {{ map.latitude }}], {{ map.zoomlevel }});
+        var mymap = L.map('mapid').setView([{{ map.lon }}, {{ map.lat }}], {{ map.zoomlevel }});
         L.tileLayer(
             'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
             maxZoom: 17,
@@ -101,9 +101,9 @@
 
 
 					if ({{ map.location_msg.show_precision }} === 1)  {
-					    markers.bindPopup('<b>{{ map.location_msg.first_line }} (Genauigkeit: ' + radius + 'm)</b><br>{{ map.location_msg.second_line_pt1 }}<a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+					    markers.bindPopup('<b>{{ map.location_msg.first_line }} (Genauigkeit: ' + radius + 'm)</b><br>{{ map.location_msg.second_line_pt1 }}<a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
                     } else {
-                         markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+                         markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
                     }
 
                     circles =  L.circle(e.latlng, radius);
@@ -111,8 +111,6 @@
 
                     container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";
                 };
-
-
 
                     mymap.on('locationfound', onLocationFound);
 
@@ -141,7 +139,7 @@
 
                 markers = L.marker(e.latlng, {draggable:'true'});
                 mymap.addLayer(markers);
-                markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+                markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
 
                 markers.on('dragend', function() {
                     var coord = String(markers.getLatLng()).split(',');
@@ -153,7 +151,7 @@
 
 
 
-                    markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?latitude='+latstring+'&longitude='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+                    markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
 
             });
         });

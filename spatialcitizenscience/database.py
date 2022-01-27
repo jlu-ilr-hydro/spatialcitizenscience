@@ -50,8 +50,8 @@ class Connection:
     """
     Wraps a sqlite connection for use with the field definition model
     """
-    def __init__(self, path, config=None):
-        config = config or get_config().database
+    def __init__(self, path, config):
+
         self.tablename = config.tablename
         self.__connection = sqlite3.connect(os.path.join(path, config.filename))
         self.fields = config.fields
@@ -92,6 +92,10 @@ class Connection:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_val:
+            self.__connection.rollback()
+        else:
+            self.__connection.commit()
         self.__connection.close()
 
     def execute(self, cmd, args=()):

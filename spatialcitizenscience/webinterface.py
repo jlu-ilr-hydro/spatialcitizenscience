@@ -1,11 +1,26 @@
 import flask as flask
 import markdown
 import bleach
+from pathlib import Path
+
 from .configuration import Config
 from . import database as db
-from . import form
+from .form import create_form_type
 
-app = flask.Flask(__name__)
+
+def create_app():
+    app = flask.Flask(__name__, instance_path=str(Path('.').absolute()))
+    print('Using configuration from: ', app.instance_path)
+    with Config() as config:
+        app.config.from_mapping(config)
+        print(config)
+    db.debug = app.config['DEBUG']
+    return app
+
+
+app = create_app()
+
+
 def clean(text: str):
 
     return flask.Markup(
@@ -55,41 +70,25 @@ def map():
         return render("map.html", title="map", map=config.map, showsites=False)
 
 
-@app.route('/form', methods=['GET'])
+@app.route('/form', methods=['GET', 'POST'])
 def form():
     """
     Displays the data entry form. The data entry form uses the config.database.fields to show the entries
     """
+    req = flask.request
     with Config() as config:
-        F = form.create_form_type(config.database.fields, use_flask_wtf=True)
-        f = F(flask.request)
+        F = create_form_type(config.database.fields, use_flask_wtf=True)
+        f = F()
 
-    return render("form.html", form=f, title="Eingabe")
+        if f.validate_on_submit():
+            with db.Connection(app.instance_path, config.database) as con:
+                con.write_entry(**f.data)
+            return flask.redirect(flask.url_for('map'))
+        else:
+            for k, v in flask.request.args.items():
+                f[k].data = v
+            return render("form.html", form=f, title="Eingabe")
 
-
-@app.route('/save', methods=['POST'])
-def save():
-    """
-    Saves the data from form to the database, accepts only POST data
-    """
-    db.debug = True
-    with db.Connection(app.root_path) as con:
-
-        # Translate the request.form dictionary (with strings)
-        # to a dictionary that maps from field name to the value of the correct type
-        # Uses db.str_to_python_type dictionary to create the right type
-        result = {}
-        for f in con.fields:
-            if f.name in flask.request.form:
-                result[f.name] = db.str_to_python_type[f.type](flask.request.form.get(f.name))
-
-        # Write the result into the database
-        con.write_entry(**result)
-        con.commit()
-
-    db.debug = False
-    # Return to map
-    return flask.redirect(flask.url_for('map'))
 
 
 @app.route('/about', methods=['GET'])
@@ -134,5 +133,5 @@ def sites_csv():
 
 @app.route('/sites.map', methods=['GET'])
 def sites_map():
-    map_config = get_config().map
-    return flask.render_template("map.html", title=map.title, map=map_config, showsites=True)
+    with Config() as config:
+        return flask.render_template("map.html", title=config.map.title, map=config.map, showsites=True)

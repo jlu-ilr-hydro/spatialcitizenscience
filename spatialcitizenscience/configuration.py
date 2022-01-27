@@ -26,11 +26,6 @@ def stream_scope(stream_or_path, mode='r'):
         stream.close()
 
 
-home = Path(__file__).parent
-
-
-preferences_dir = home
-
 
 class Config(dict):
 
@@ -52,7 +47,7 @@ class Config(dict):
     def __repr__(self):
         return f'Config()'
 
-    def load(self, filename: str = None, dir: Path = preferences_dir):
+    def load(self, filename: str = None):
         """
         Loads a yaml configuration file as an object structure
         :param filename: filename in the directory
@@ -61,8 +56,8 @@ class Config(dict):
         """
         if not filename:
             filename = 'config.yaml'
-        fn = dir / filename
-        with open(fn) as f:
+
+        with open(filename, encoding='utf-8') as f:
             data = yaml.load(f, Loader=ConfigYAMLLoader)
         return data
 

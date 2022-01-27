@@ -1,6 +1,12 @@
 from flask_wtf import FlaskForm
 import wtforms as wtf
+import datetime
 
+def datetime_field_factory(*args, **kwargs):
+
+    kwargs.setdefault('default', datetime.datetime.now)
+    kwargs.setdefault('format', '%Y-%m-%dT%H:%M')
+    return wtf.DateTimeLocalField(*args, **kwargs)
 
 _field_types = dict(
     int=wtf.IntegerField,
@@ -8,7 +14,7 @@ _field_types = dict(
     str=wtf.StringField,
     bool=wtf.BooleanField,
     date=wtf.DateField,
-    datetime=wtf.DateTimeLocalField,
+    datetime=datetime_field_factory,
 )
 
 
@@ -17,7 +23,7 @@ def get_wtf_field(field):
     if 'notnull' in field and field.notnull:
         validators = [wtf.validators.DataRequired()]
     else:
-        validators = []
+        validators = [wtf.validators.Optional()]
     if 'options' in field:
         return wtf.SelectField(field.description, choices=field.options, validators=validators)
 
