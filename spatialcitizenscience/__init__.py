@@ -1,6 +1,5 @@
-from .webinterface import app
-from .configuration import Config
-
+from .app import app
+from . import view
 import os
 
 if __name__ == "__main__":

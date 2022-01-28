@@ -33,9 +33,9 @@
             crossorigin=""></script>
 	
 	{% if title %}
-		<title>{{ title }}</title>
+		<title>{{ title | clean }}</title>
 	{% else %}
-		<title>Titel</title>
+		<title>{{ config.title | clean }}</title>
 	{% endif %}
 	
 	
@@ -44,16 +44,16 @@
 	<header class="site-header">
 	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
 		<div class="container">
-		  <a class="navbar-brand mr-4" href=".">{{ clean(config.title) }}</a>
+		  <a class="navbar-brand mr-4" href=".">{{ config.title | clean }}</a>
 			  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			  </button>
 		  <div class="collapse navbar-collapse" id="navbarToggle">
 			<div class="navbar-nav mr-auto">
                 {% for page in config.content %}
-	    		  <a class="nav-item nav-link" href="{{ url_for(page) }}">{{ clean(config.content[page].title) }}</a>
+	    		  <a class="nav-item nav-link" href="{{ url_for(page) }}">{{ config.content[page].title | clean }}</a>
                 {% endfor %}
-                <a class="nav-item nav-link" href="{{ url_for('map') }}">{{ clean(config.map.title) }}</a>
+                <a class="nav-item nav-link" href="{{ url_for('map') }}">{{ config.map.title | clean }}</a>
 			</div>
 		  </div>
 		</div>

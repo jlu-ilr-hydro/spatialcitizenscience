@@ -26,7 +26,6 @@ def stream_scope(stream_or_path, mode='r'):
         stream.close()
 
 
-
 class Config(dict):
 
     def __dir__(self):
@@ -59,7 +58,8 @@ class Config(dict):
 
         with open(filename, encoding='utf-8') as f:
             data = yaml.load(f, Loader=ConfigYAMLLoader)
-        return data
+            self.update(data)
+        return self
 
     def __enter__(self):
         return self.load()

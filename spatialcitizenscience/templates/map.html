@@ -43,9 +43,9 @@
         var mymap = L.map('mapid').setView([{{ map.lon }}, {{ map.lat }}], {{ map.zoomlevel }});
         L.tileLayer(
             'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            maxZoom: 17,
-            attribution: 'Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © <a href="https://opentopomap.org/about">OpenTopoMap</a> (CC-BY-SA)'
-        }).addTo(mymap);
+                maxZoom: 17,
+                attribution: 'Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © <a href="https://opentopomap.org/about">OpenTopoMap</a> (CC-BY-SA)'
+            }).addTo(mymap);
 
         <!--  create control object -->
         var LocationButton = L.Control.extend({
@@ -86,77 +86,80 @@
                         var coord = e.latlng.toString().split(',');
                         var lat = coord[0].split('(');
                         var lng = coord[1].split(')');
-                        var latstring = lat.toString().slice(7,);
-                        var lngstring = lng.toString().slice(1,-1);
 
                         if (markers !== undefined) {
                             mymap.removeLayer(markers);
-                        };
+                        }
                         if (circles !== undefined) {
                             mymap.removeLayer(circles);
-                        };
+                        }
 
                         markers =  L.marker(e.latlng); //, {draggable:'true'}
                         mymap.addLayer(markers);
+                        var latstring = lat.toString().slice(7,);
+                        var lngstring = lng.toString().slice(1,-1);
+                        let form_url = '{{ url_for("form") }}?' + $.param({lat: latstring, lon: lngstring})
+                        markers.bindPopup(
+                            `<a class="btn btn-secondary" href="${form_url}">{{ map.location_msg }}</a>`
+                        ).openPopup();
 
 
-					if ({{ map.location_msg.show_precision }} === 1)  {
-					    markers.bindPopup('<b>{{ map.location_msg.first_line }} (Genauigkeit: ' + radius + 'm)</b><br>{{ map.location_msg.second_line_pt1 }}<a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
-                    } else {
-                         markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
-                    }
+                        circles =  L.circle(e.latlng, radius);
+                        mymap.addLayer(circles);
 
-                    circles =  L.circle(e.latlng, radius);
-                    mymap.addLayer(circles);
-
-                    container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";
-                };
+                        container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";
+                    };
 
                     mymap.on('locationfound', onLocationFound);
 
-			};
+                };
                 return container;
             },
         });
         mymap.addControl(new LocationButton());
 
         {%  if not showsites %}
-        <!-- set up click on map event to create a marker -->
-        mymap.on('click',
-            function(e){
-                var coord = e.latlng.toString().split(',');
-                var lat = coord[0].split('(');
-                var lng = coord[1].split(')');
-                var latstring = lat.toString().slice(7,);
-                var lngstring = lng.toString().slice(1,-1);
-
-                if (markers !== undefined) {
-                    mymap.removeLayer(markers);
-                };
-                if (circles !== undefined) {
-                    mymap.removeLayer(circles);
-                };
-
-                markers = L.marker(e.latlng, {draggable:'true'});
-                mymap.addLayer(markers);
-                markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
-
-                markers.on('dragend', function() {
-                    var coord = String(markers.getLatLng()).split(',');
+            <!-- set up click on map event to create a marker -->
+            mymap.on('click',
+                function(e){
+                    var coord = e.latlng.toString().split(',');
                     var lat = coord[0].split('(');
                     var lng = coord[1].split(')');
-
                     var latstring = lat.toString().slice(7,);
                     var lngstring = lng.toString().slice(1,-1);
 
+                    if (markers !== undefined) {
+                        mymap.removeLayer(markers);
+                    }
+                    if (circles !== undefined) {
+                        mymap.removeLayer(circles);
+                    }
+
+                    markers = L.marker(e.latlng, {draggable:'true'});
+                    mymap.addLayer(markers);
+                    let form_url = '{{ url_for("form") }}?' + $.param({lat: latstring, lon: lngstring})
+                    markers.bindPopup(
+                        `<a class="btn btn-light" href="${form_url}">{{ map.location_msg }}</a>`
+                    ).openPopup();
+
+                    markers.on('dragend', function(e) {
+                        var coord = String(markers.getLatLng()).split(',');
+                        var lat = coord[0].split('(');
+                        var lng = coord[1].split(')');
+
+                        var latstring = lat.toString().slice(7,);
+                        var lngstring = lng.toString().slice(1,-1);
 
 
-                    markers.bindPopup('<b>{{ map.location_msg.first_line }} </b><br> {{ map.location_msg.second_line_pt1 }} <a href="{{ url_for('form') }}?lat='+latstring+'&lon='+lngstring+'"> {{ map.location_msg.link_string }}</a> {{ map.location_msg.second_line_pt2 }}').openPopup();
+                        let form_url = '{{ url_for("form") }}?' + $.param({lat: latstring, lon: lngstring})
+                        markers.bindPopup(
+                            `<a class="btn btn-light" href="${form_url}">{{ map.location_msg }}</a>`
+                        ).openPopup();
 
-            });
-        });
+                    });
+                });
         {% elif showsites %}
-        // Load data from server
+            // Load data from server
             let legend = {
                 colors: ['#ffffcc','#a1dab4','#41b6c4','#225ea8'],
                 limits: [2, 4, 8],
@@ -172,70 +175,70 @@
                 }
             };
             var geojson;
-        $.getJSON('sites.geojson', {},
-            function(data) {
-                console.log(data);
-                geojson = L.geoJSON(data, {
-                    onEachFeature: function(feature, layer) {
-                        layer.on({
-                            mouseover: function(e) {
-                                e.target.setStyle({
-                                    weight: 5,
-                                    color: '#666',
-                                    dashArray: '',
-                                    fillOpacity: 0.7
+            $.getJSON('sites.geojson', {},
+                function(data) {
+                    console.log(data);
+                    geojson = L.geoJSON(data, {
+                        onEachFeature: function(feature, layer) {
+                            layer.on({
+                                mouseover: function(e) {
+                                    e.target.setStyle({
+                                        weight: 5,
+                                        color: '#666',
+                                        dashArray: '',
+                                        fillOpacity: 0.7
+                                    });
+                                    info.update(layer.feature.properties);
+                                },
+                                mouseout: function(e) {
+                                    geojson.resetStyle(e.target);
+                                    info.update();
+                                },
+                                click: function(e) {
+                                    mymap.setView(e.target.feature.coordinates, mymap.getZoom() + 2);
+                                }
+                            });
+                        },
+                        pointToLayer: function(feature, latlng) {
+                            var marker = L.circleMarker(latlng,
+                                {
+                                    radius: 8,
+                                    fillColor: legend.get_color(feature.properties.length),
+                                    color: "#000",
+                                    weight: 1,
+                                    opacity: 1,
+                                    fillOpacity: 0.8
                                 });
-                                info.update(layer.feature.properties);
-                            },
-                            mouseout: function(e) {
-                                geojson.resetStyle(e.target);
-                                info.update();
-                            },
-                            click: function(e) {
-                                mymap.setView(e.target.feature.coordinates, mymap.getZoom() + 2);
-                            }
-                        });
-                    },
-                    pointToLayer: function(feature, latlng) {
-                        var marker = L.circleMarker(latlng,
-                            {
-                                radius: 8,
-                                fillColor: legend.get_color(feature.properties.length),
-                                color: "#000",
-                                weight: 1,
-                                opacity: 1,
-                                fillOpacity: 0.8
-                        });
-                        console.log(marker);
-                        return marker;
-                    }
-                }).addTo(mymap);
+                            console.log(marker);
+                            return marker;
+                        }
+                    }).addTo(mymap);
 
-             }
-        );
-        // Make info control
-        var info = L.control();
-
-        info.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-            this.update();
-            return this._div;
-        };
-
-        // method that we will use to update the control based on feature properties passed
-        info.update = function (props) {
-            let text = '<h4> Bodenriss </h4>';
-            if (props) {
-                text += '<ul>';
-                for (let propname in props) {
-                    text += '<li>' + propname + ': ' + props[propname] + '</li>';
                 }
-                text += '</ul>';
-            }
-            this._div.innerHTML = text;
-        };
+            );
+            // Make info control
+            var info = L.control();
 
-        info.addTo(mymap);
+            info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                this.update();
+                return this._div;
+            };
+
+            // method that we will use to update the control based on feature properties passed
+            info.update = function (props) {
+                let text = '<h4> Bodenriss </h4>';
+                if (props) {
+                    text += '<ul>';
+                    for (let propname in props) {
+                        text += '<li>' + propname + ': ' + props[propname] + '</li>';
+                    }
+                    text += '</ul>';
+                }
+                this._div.innerHTML = text;
+            };
+
+            info.addTo(mymap);
         {% endif %}
 
 

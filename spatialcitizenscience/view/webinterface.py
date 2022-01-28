@@ -1,57 +1,10 @@
 import flask as flask
-import markdown
-import bleach
-from pathlib import Path
 
-from .configuration import Config
-from . import database as db
+from ..configuration import Config
+from .. import database as db
 from .form import create_form_type
-
-
-def create_app():
-    app = flask.Flask(__name__, instance_path=str(Path('.').absolute()))
-    print('Using configuration from: ', app.instance_path)
-    with Config() as config:
-        app.config.from_mapping(config)
-        print(config)
-    db.debug = app.config['DEBUG']
-    return app
-
-
-app = create_app()
-
-
-def clean(text: str):
-
-    return flask.Markup(
-        bleach.clean(
-            text,
-            bleach.ALLOWED_TAGS + ['sub', 'sup'],
-            ['class']
-        )
-    )
-
-
-def render(template, title=None, **kwargs):
-    with Config() as config:
-        return flask.render_template(
-            template, title=clean(title or config['title']),
-            **kwargs,
-            config=config, clean=clean
-        )
-
-
-def render_markdown(filename, title=None):
-    """
-    Renders a markdown file to html
-    :param filename: A markdown file to render
-    :return: HTML version of the markdown file
-    """
-    with app.open_resource('markdown/' + filename) as f:
-        text = f.read()
-    text = markdown.markdown(text.decode())
-    text = flask.Markup(text)
-    return render('markdown.html', markdown_content=text, title=title)
+from .. import app
+from .webtools import render_markdown
 
 
 @app.route('/', methods=['GET'])
@@ -64,10 +17,20 @@ def index():
         return render_markdown(config.content.index.text)
 
 
+@app.route('/media/<path:filename>', methods=['GET'])
+def media(filename):
+    """
+    Returns a file from the media directory
+    :return:
+    """
+    media_path = app.instance_path + '/media'
+    return flask.send_from_directory(media_path, filename)
+
+
 @app.route('/map', methods=['GET'])
 def map():
     with Config() as config:
-        return render("map.html", title="map", map=config.map, showsites=False)
+        return flask.render_template("map.html", title="map", map=config.map, showsites=False)
 
 
 @app.route('/form', methods=['GET', 'POST'])
@@ -75,7 +38,6 @@ def form():
     """
     Displays the data entry form. The data entry form uses the config.database.fields to show the entries
     """
-    req = flask.request
     with Config() as config:
         F = create_form_type(config.database.fields, use_flask_wtf=True)
         f = F()
@@ -87,8 +49,7 @@ def form():
         else:
             for k, v in flask.request.args.items():
                 f[k].data = v
-            return render("form.html", form=f, title="Eingabe")
-
+            return flask.render_template("form.html", form=f, title="Eingabe")
 
 
 @app.route('/about', methods=['GET'])
