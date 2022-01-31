@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 
 packages = ['spatialcitizenscience']
@@ -26,8 +26,8 @@ def get_version(rel_path):
 
 setup(
     name=packages[0],
-    packages=packages,
-    version=get_version(packages[0] + '__init__.py'),
+    packages=find_packages(),
+    version=get_version(packages[0] + '/__init__.py'),
     include_package_data=True,
     install_requires=install_requires,
     python_requires='>=3.8',

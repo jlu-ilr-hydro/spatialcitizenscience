@@ -1,0 +1,2 @@
+recursive-include spatialcitizenscience/templates *
+recursive-include spatialcitizenscience/static *
