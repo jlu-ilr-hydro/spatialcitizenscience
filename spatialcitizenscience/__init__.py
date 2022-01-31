@@ -1,3 +1,4 @@
+__version__ = '2022.01.31a0'
 import os
 
 if __name__ == "__main__":

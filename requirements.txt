@@ -5,3 +5,4 @@ Flask-WTF>=1.0.0
 geojson
 pyyaml
 pytest
+gunicorn
