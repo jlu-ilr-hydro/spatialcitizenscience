@@ -30,7 +30,7 @@ def test_single_field_in_form(field):
 @pytest.mark.parametrize('field', fields)
 def test_fail_validation_single_field(field):
     Form = form.create_form_type([field])
-    f = Form()
+    f = Form(**{field.name: None})
     f.validate()
     assert f.errors, field.type + ': Found no validation error, although data is missing'
 
