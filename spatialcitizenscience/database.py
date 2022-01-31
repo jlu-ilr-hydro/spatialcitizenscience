@@ -50,11 +50,15 @@ class Connection:
     """
     Wraps a sqlite connection for use with the field definition model
     """
-    def __init__(self, path, config):
+    def __init__(self, config):
+        if config.database.filename == ':memory:':
+            self.__connection = sqlite3.connect(':memory:')
+        else:
+            self.__connection = sqlite3.connect(config.home / config.database.filename)
 
-        self.tablename = config.tablename
-        self.__connection = sqlite3.connect(os.path.join(path, config.filename))
-        self.fields = config.fields
+        self.tablename = config.database.tablename
+        self.fields = config.database.fields
+        self.fields = config.database.fields
         self.fieldnames = [f.name for f in self.fields]
         self.create()
 

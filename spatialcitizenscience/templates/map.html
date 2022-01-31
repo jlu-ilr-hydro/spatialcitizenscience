@@ -42,9 +42,10 @@
         <!-- create map object on load it -->
         var mymap = L.map('mapid').setView([{{ map.lon }}, {{ map.lat }}], {{ map.zoomlevel }});
         L.tileLayer(
-            'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17,
-                attribution: 'Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © <a href="https://opentopomap.org/about">OpenTopoMap</a> (CC-BY-SA)'
+            '{{ map.tiles.source }}', {
+                maxZoom: {{ map.tiles.maxZoom }},
+                attribution: '{{ map.tiles.attribution }}',
+                accessToke: '{{  accessToken }}'
             }).addTo(mymap);
 
         <!--  create control object -->
@@ -98,7 +99,7 @@
                         mymap.addLayer(markers);
                         var latstring = lat.toString().slice(7,);
                         var lngstring = lng.toString().slice(1,-1);
-                        let form_url = '{{ url_for("form") }}?' + $.param({lat: latstring, lon: lngstring})
+                        let form_url = '{{ url_for("ui.form") }}?' + $.param({lat: latstring, lon: lngstring})
                         markers.bindPopup(
                             `<a class="btn btn-secondary" href="${form_url}">{{ map.location_msg }}</a>`
                         ).openPopup();
@@ -137,7 +138,7 @@
 
                     markers = L.marker(e.latlng, {draggable:'true'});
                     mymap.addLayer(markers);
-                    let form_url = '{{ url_for("form") }}?' + $.param({lat: latstring, lon: lngstring})
+                    let form_url = '{{ url_for("ui.form") }}?' + $.param({lat: latstring, lon: lngstring})
                     markers.bindPopup(
                         `<a class="btn btn-light" href="${form_url}">{{ map.location_msg }}</a>`
                     ).openPopup();
@@ -151,7 +152,7 @@
                         var lngstring = lng.toString().slice(1,-1);
 
 
-                        let form_url = '{{ url_for("form") }}?' + $.param({lat: latstring, lon: lngstring})
+                        let form_url = '{{ url_for("ui.form") }}?' + $.param({lat: latstring, lon: lngstring})
                         markers.bindPopup(
                             `<a class="btn btn-light" href="${form_url}">{{ map.location_msg }}</a>`
                         ).openPopup();

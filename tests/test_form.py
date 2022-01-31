@@ -1,5 +1,6 @@
 import pytest
-from spatialcitizenscience import Config, form
+from spatialcitizenscience.configuration import Config
+from spatialcitizenscience.view import form
 import datetime
 
 fields = [
@@ -10,6 +11,7 @@ fields = [
     Config(name='f_datetime', type='datetime', notnull=True, description='A datetime test äö', value=datetime.datetime.fromisoformat('2022-01-26 16:18:00')),
     Config(name='f_select', type='str', notnull=True, description='A select test äö', options=['a', 'b', 'c'], value='a')
 ]
+
 
 @pytest.mark.parametrize('field', fields)
 def test_field_creation(field):
@@ -31,6 +33,7 @@ def test_fail_validation_single_field(field):
     f = Form()
     f.validate()
     assert f.errors, field.type + ': Found no validation error, although data is missing'
+
 
 @pytest.mark.parametrize('field', fields[:-1])
 def test_no_validation_single_field(field):

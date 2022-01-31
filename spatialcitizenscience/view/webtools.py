@@ -2,10 +2,7 @@ import flask
 import bleach
 import markdown
 
-from .. import app
 
-
-@app.template_filter('clean')
 def clean(text: str):
     """
     Cleans user given text using the
@@ -34,6 +31,7 @@ def render_markdown(filename, title=None):
     :param filename: A markdown file to render
     :return: HTML version of the markdown file
     """
+    app = flask.current_app
     for app_open in [app.open_instance_resource, app.open_resource, open]:
         try:
             with app_open(filename) as f:

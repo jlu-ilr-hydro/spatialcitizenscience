@@ -28,6 +28,12 @@ def stream_scope(stream_or_path, mode='r'):
 
 class Config(dict):
 
+    @classmethod
+    def set_home(cls, config_home):
+        cls.__home = Path(config_home)
+
+    __home = Path('.')
+
     def __dir__(self):
         return self.keys()
 
@@ -37,8 +43,9 @@ class Config(dict):
         except KeyError:
             raise AttributeError(f'This Config() does not contain {item}')
 
-    def __init__(self, **kwargs):
+    def __init__(self, home=None, **kwargs):
         super().__init__(**kwargs)
+        self.__home = Path(home or Config.__home)
 
     def __str__(self):
         return yaml.dump(self)
@@ -54,12 +61,25 @@ class Config(dict):
         :return: ordereddict.AttrDict with the data from the file
         """
         if not filename:
-            filename = 'config.yaml'
+            filename = 'config.yml'
 
-        with open(filename, encoding='utf-8') as f:
+        if (f := self.__home / filename).exists():
+            filename = f
+        elif (f := Path(filename)).exists():
+            filename = f
+        else:
+            raise FileNotFoundError(f'File {filename} not found')
+
+        with filename.open(encoding='utf-8') as f:
             data = yaml.load(f, Loader=ConfigYAMLLoader)
             self.update(data)
+
+        self.__home = Path(filename).parent
         return self
+
+    @property
+    def home(self) -> Path:
+        return self.__home
 
     def __enter__(self):
         return self.load()

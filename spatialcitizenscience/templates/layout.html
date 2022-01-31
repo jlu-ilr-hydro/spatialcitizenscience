@@ -51,9 +51,9 @@
 		  <div class="collapse navbar-collapse" id="navbarToggle">
 			<div class="navbar-nav mr-auto">
                 {% for page in config.content %}
-	    		  <a class="nav-item nav-link" href="{{ url_for(page) }}">{{ config.content[page].title | clean }}</a>
+	    		  <a class="nav-item nav-link" href="{{ url_for('ui.' + page) }}">{{ config.content[page].title | clean }}</a>
                 {% endfor %}
-                <a class="nav-item nav-link" href="{{ url_for('map') }}">{{ config.map.title | clean }}</a>
+                <a class="nav-item nav-link" href="{{ url_for('ui.map') }}">{{ config.map.title | clean }}</a>
 			</div>
 		  </div>
 		</div>
@@ -76,7 +76,7 @@
       <div class="container">
         <span> 
 		<ul>
-			<li><a href="{{ url_for('about') }}">Impressum</a></li>
+			<li><a href="{{ url_for('ui.about') }}">Impressum</a></li>
 		</ul>
 
 		
