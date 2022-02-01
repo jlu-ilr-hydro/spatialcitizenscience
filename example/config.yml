@@ -1,0 +1,53 @@
+title: "Test-Title"
+favicon: images/favicon.ico
+database:
+  filename: test.sqlite
+  tablename: entries
+  fields:
+    - name: lat
+      type: float
+      description: °N
+      notnull: true
+    - name: lon
+      type: float
+      description: °E
+      notnull: true
+    - name: time
+      type: datetime
+      description: Date and time of measurement
+      notnull: true
+    - name: value
+      type: float
+      notnull: true
+      description: The value
+    - name: option
+      type: str
+      description: An example for options
+      options:
+        - ''
+        - Option A
+        - Option B
+        - Option C
+
+content:
+  index:
+    title: Start
+    text: index.md
+  about:
+    title: About
+    text: about.md
+map:
+  title: Map
+  lon: 51.1
+  lat: 9.8
+  zoomlevel: 6
+  tiles:
+    source: https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png
+    attribution: 'Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © OpenTopoMap (CC-BY-SA) (https://opentopomap.org/about)'
+    maxZoom: 17
+    accessToken: ''
+  location_btn: Standort ermitteln
+  location_msg: Neuen Eintrag erstellen...
+  access_token: pk.eyJ1IjoicGhpbGlwcGtyYWZ0IiwiYSI6ImNreXNqY3FyZjBuNm4yb3FhM2VmcjdxbXAifQ._zY1PN80gUpqEPe_3ZnYrA
+
+SECRET_KEY: xy7PDi1XqBHtvYnnFB4xqTsPg0SOO5VrnSGIYEPr

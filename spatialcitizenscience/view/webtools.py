@@ -36,6 +36,7 @@ def render_markdown(filename, title=None):
         try:
             with app_open(filename) as f:
                 text = decode_if_needed(f.read())
+                title = title or text.split('\n', 1)[0]
                 break
         except FileNotFoundError:
             ...

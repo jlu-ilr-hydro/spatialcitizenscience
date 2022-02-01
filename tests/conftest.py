@@ -28,7 +28,7 @@ database:
 content:
   index:
     title: Index
-    text: main.md
+    text: index.md
   about:
     title: About
     text: about.md

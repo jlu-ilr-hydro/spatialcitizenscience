@@ -3,20 +3,13 @@ import flask as flask
 from ..configuration import Config
 from .. import database as db
 from .form import create_form_type
-from .webtools import render_markdown, clean
+from .webtools import render_markdown
+
+from pathlib import Path
 
 
 ui = flask.Blueprint('ui', __name__, template_folder='../templates')
 ui.app_template_filter('clean')
-
-@ui.route('/', methods=['GET'])
-def index():
-    """
-    Returns main.md
-    :return:
-    """
-    with Config() as config:
-        return render_markdown(config.content.index.text)
 
 
 @ui.route('/media/<path:filename>', methods=['GET'])
@@ -54,9 +47,22 @@ def form():
             return flask.render_template("form.html", form=f, title="Eingabe")
 
 
-@ui.route('/about', methods=['GET'])
-def about():
-    return render_markdown('about.md', 'Über')
+@ui.route('/<path:page>', methods=['GET'])
+def content(page):
+    path = Path(flask.current_app.instance_path) / 'content' / page
+    if path.is_dir():
+        path /= 'index.md'
+    else:
+        path = path.with_suffix('.md')
+    if path.exists():
+        return render_markdown(path)
+
+    flask.abort(404, f'{page} is not a configured content page')
+
+
+@ui.route('/', methods=['GET'])
+def index():
+    return content('')
 
 
 @ui.route('/sites.geojson', methods=['GET'])
