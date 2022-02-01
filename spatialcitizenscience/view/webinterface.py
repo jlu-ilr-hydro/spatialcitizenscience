@@ -11,6 +11,23 @@ from pathlib import Path
 ui = flask.Blueprint('ui', __name__, template_folder='../templates')
 ui.app_template_filter('clean')
 
+@ui.route('/', methods=['GET'])
+def index():
+    return content('')
+
+
+@ui.route('/<path:page>', methods=['GET'])
+def content(page):
+    path = Path(flask.current_app.instance_path) / 'content' / page
+    if path.is_dir():
+        path /= 'index.md'
+    else:
+        path = path.with_suffix('.md')
+    if path.exists():
+        return render_markdown(path)
+
+    flask.abort(404, f'{page} is not a configured content page')
+
 
 @ui.route('/media/<path:filename>', methods=['GET'])
 def media(filename):
@@ -20,12 +37,6 @@ def media(filename):
     """
     media_path = flask.current_app.instance_path + '/media'
     return flask.send_from_directory(media_path, filename)
-
-
-@ui.route('/map', methods=['GET'])
-def map():
-    with Config() as config:
-        return flask.render_template("map.html", title="map", map=config.map, showsites=False)
 
 
 @ui.route('/form', methods=['GET', 'POST'])
@@ -47,22 +58,10 @@ def form():
             return flask.render_template("form.html", form=f, title="Eingabe")
 
 
-@ui.route('/<path:page>', methods=['GET'])
-def content(page):
-    path = Path(flask.current_app.instance_path) / 'content' / page
-    if path.is_dir():
-        path /= 'index.md'
-    else:
-        path = path.with_suffix('.md')
-    if path.exists():
-        return render_markdown(path)
-
-    flask.abort(404, f'{page} is not a configured content page')
-
-
-@ui.route('/', methods=['GET'])
-def index():
-    return content('')
+@ui.route('/map', methods=['GET'])
+def map():
+    with Config() as config:
+        return flask.render_template("map.html", title=config.map.title, map=config.map)
 
 
 @ui.route('/sites.geojson', methods=['GET'])
@@ -73,7 +72,7 @@ def sites_geojson():
     """
 
     with Config() as config:
-        with db.Connection() as con:
+        with db.Connection(config) as con:
             features = con.features()
             features = list(features)
     return flask.jsonify(features)
@@ -106,4 +105,4 @@ def sites_csv():
 @ui.route('/sites.map', methods=['GET'])
 def sites_map():
     with Config() as config:
-        return flask.render_template("map.html", title=config.map.title, map=config.map, showsites=True)
+        return flask.render_template("map-sites.html", title=config.map.title, map=config.map)

@@ -2,7 +2,7 @@ title: "Test-Title"
 base_url: /
 
 favicon: images/favicon.ico
-logo: '&#xF64C;'
+logo: <i class="bi bi-pin-map"></i>
 logolink: https://github.com/jlu-ilr-hydro/spatialcitizenscience
 
 database:
