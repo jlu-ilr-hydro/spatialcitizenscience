@@ -1,6 +1,10 @@
 title: "Test-Title"
-favicon: images/favicon.ico
 base_url: /
+
+favicon: images/favicon.ico
+logo: '&#xF64C;'
+logolink: https://github.com/jlu-ilr-hydro/spatialcitizenscience
+
 database:
   filename: test.sqlite
   tablename: entries
