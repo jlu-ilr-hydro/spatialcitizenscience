@@ -49,14 +49,14 @@
 	<header class="site-header">
 	  <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
 		<div class="container">
-		  <a class="navbar-brand mr-4" href=".">{{ config.title | clean }}</a>
+		  <a class="navbar-brand mr-4" href="{{ config.base_url }}">{{ config.title | clean }}</a>
 			  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			  </button>
 		  <div class="collapse navbar-collapse" id="navbarToggle">
 			<div class="navbar-nav mr-auto">
-                {% for page in config.content %}
-	    		  <a class="nav-item nav-link" href="{{ url_for('ui.content', page=page) }}">{{ config.content[page].title | clean }}</a>
+                {% for page in config.navigation %}
+	    		  <a class="nav-item nav-link" href="{{ url_for('ui.content', page=page) }}">{{ config.navigation[page] | clean }}</a>
                 {% endfor %}
                 <a class="nav-item nav-link" href="{{ url_for('ui.map') }}">{{ config.map.title | clean }}</a>
 			</div>
@@ -81,7 +81,7 @@
       <div class="container">
 		<ul>
 			<li>
-                <a class="link-light" href="{{ url_for('ui.content', page='about') }}">{{ config.content.about.title }}</a>
+                <a class="link-light" href="{{ url_for('ui.content', page='about') }}">{{ config.navigation.about }}</a>
             </li>
 		</ul>
       </div>

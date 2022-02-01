@@ -1,5 +1,5 @@
-Method
-======
+Details of the method
+=====================
 
 This page is optional and just an example of an additional page. It can be 
 used to explain the methodology in more detail.

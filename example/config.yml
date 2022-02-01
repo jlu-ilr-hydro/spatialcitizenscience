@@ -1,5 +1,6 @@
 title: "Test-Title"
 favicon: images/favicon.ico
+base_url: /
 database:
   filename: test.sqlite
   tablename: entries
@@ -29,13 +30,10 @@ database:
         - Option B
         - Option C
 
-content:
-  index:
-    title: Start
-    text: index.md
-  about:
-    title: About
-    text: about.md
+navigation:
+  about: About
+  method/details: Method
+
 map:
   title: Map
   lon: 51.1
