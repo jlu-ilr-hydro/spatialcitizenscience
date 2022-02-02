@@ -43,9 +43,9 @@
 <header class="site-header">
     <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-            <a href="{{ config.logolink }}" class="navbar-brand mr-4">{{ config.logo | safe}}</a>
-            <a class="navbar-brand mr-4" href="{{ config.base_url }}">{{ config.title | clean }}</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <!--a href="{{ config.logolink }}" class="navbar-brand mr-4">{{ config.logo | safe}}</a-->
+            <a class="navbar-brand" href="{{ config.base_url }}">{{ config.title | clean }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarToggle">
@@ -71,16 +71,6 @@
     {% block map %}{% endblock map %}
 </main>
 
-<!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <ul>
-            <li>
-                <a class="link-light" href="{{ url_for('ui.content', page='about') }}">{{ config.navigation.about }}</a>
-            </li>
-        </ul>
-    </div>
-</footer>
 <!-- Footer -->
 </body>
 </html>
