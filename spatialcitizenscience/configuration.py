@@ -29,6 +29,15 @@ def stream_scope(stream_or_path, mode='r'):
 class Config(dict):
 
     @classmethod
+    def find_home(cls):
+        paths = [Path(p) / 'config.yml' for p in ('.', 'app', '/app')]
+        for path in paths:
+            if path.exists():
+                cls.__home = path.parent
+                return path.parent
+        raise FileNotFoundError('Did not find any of: ' + ', '.join(str(p) for p in paths))
+
+    @classmethod
     def set_home(cls, config_home):
         cls.__home = Path(config_home)
 

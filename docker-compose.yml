@@ -1,0 +1,11 @@
+version: '0.1'
+
+services:
+  web:
+    build: ./
+    command: waitress-serve --port=8000 --call 'spatialcitizenscience:create_app'
+    ports:
+      - 8000:8000
+    volumes:
+      - app:/app
+

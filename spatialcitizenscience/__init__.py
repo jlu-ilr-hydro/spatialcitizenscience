@@ -1,6 +1,29 @@
 __version__ = '2022.01.31a0'
+
 import os
-from .app import create_app
+
+import os
+import flask
+from pathlib import Path
+
+from .configuration import Config
+from . import database as db
+from . import view
+
+
+def create_app(test_config=None):
+    home = Config.find_home()
+    app = flask.Flask(__name__, instance_path=str(home.absolute()))
+    with Config() as config:
+        app.config.from_mapping(config)
+        app.add_template_global(config, 'config')
+    if test_config:
+        app.config.from_mapping(test_config)
+    app.register_blueprint(view.ui)
+    app.add_template_filter(view.clean)
+    db.debug = app.config['DEBUG']
+    return app
+
 
 if __name__ == "__main__":
     app = create_app()
