@@ -18,5 +18,3 @@ def create_app():
     db.debug = app.config['DEBUG']
     return app
 
-
-app = create_app()
