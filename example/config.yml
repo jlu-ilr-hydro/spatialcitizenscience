@@ -2,8 +2,9 @@ title: "Test-Title"
 base_url: /
 
 favicon: images/favicon.ico
-logo: <i class="bi bi-pin-map"></i>
-logolink: https://github.com/jlu-ilr-hydro/spatialcitizenscience
+logo:
+  look: <i class="bi bi-pin-map"></i>
+  link: https://github.com/jlu-ilr-hydro/spatialcitizenscience
 
 database:
   filename: test.sqlite

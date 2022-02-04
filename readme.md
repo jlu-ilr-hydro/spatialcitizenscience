@@ -19,7 +19,8 @@ the following:
 
 ### In a container
 
-Dockerfiles for isolated execution in a container are under development
+The simplest way is to install the app in a Docker container. Relevant files together with an example app [can be found
+here](https://github.com/jlu-ilr-hydro/spatialcitizenscience).
 
 
 
