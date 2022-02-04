@@ -92,7 +92,9 @@
                 {
                     maxZoom: {{ map.tiles.maxZoom }},
                     attribution: '{{ map.tiles.attribution }}',
-                    accessToke: '{{  accessToken }}'
+            {% if map.tiles.get('accessToken') %}
+                    accessToken: '{{  map.tiles.access_token }}'
+            {% endif %}
                 }
             ).addTo(C.lmap);
 
