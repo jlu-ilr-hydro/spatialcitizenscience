@@ -1,14 +1,22 @@
+# Title of the project, simple html markup is allowed
 title: "Test-Title"
+# Base URL for the whole app
 base_url: /
-
+# The favicon, to use your own, save it at <config.yml path>/media/favicon.ico
+# and change it to media/favicon.ico
 favicon: images/favicon.ico
+
+# Optional: A logo on the left upper corner of the app.
 logo:
   look: <i class="bi bi-pin-map"></i>
   link: https://github.com/jlu-ilr-hydro/spatialcitizenscience
 
+# Defintion of the database
 database:
   filename: test.sqlite
   tablename: entries
+  # These fields will appear in the form, names must be valid for SQL and Python
+  # Field types must be in [int, float, str, bool, datetime]
   fields:
     - name: lat
       type: float
@@ -35,22 +43,35 @@ database:
         - Option B
         - Option C
 
+# List every page to be linked in the navigation bar of the app For legal reasons in the EU, the about page needs
+# to be linked very prominent
 navigation:
   about: About
   method/details: Method
 
+# Configuration of the map
 map:
+  # Title in the navigation
   title: Map
+  # Startup center / zoom of the map
   lon: 51.1
   lat: 9.8
   zoomlevel: 6
+
+  # Map tile source, see here: https://leaflet-extras.github.io/leaflet-providers/preview/
   tiles:
     source: https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png
     attribution: 'Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © OpenTopoMap (CC-BY-SA) (https://opentopomap.org/about)'
     maxZoom: 17
-    accessToken: ''
-  location_btn: Standort ermitteln
-  location_msg: Neuen Eintrag erstellen...
-  access_token: pk.eyJ1IjoicGhpbGlwcGtyYWZ0IiwiYSI6ImNreXNqY3FyZjBuNm4yb3FhM2VmcjdxbXAifQ._zY1PN80gUpqEPe_3ZnYrA
+    # Access token might be needed for some map tile providers, eg. Mapbox, ESRI
+    # access_token: ''
 
-SECRET_KEY: xy7PDi1XqBHtvYnnFB4xqTsPg0SOO5VrnSGIYEPr
+  # Caption of the location button
+  location_btn: Get location
+
+  # Caption of the create site button
+  location_msg: Create new entry...
+
+# Secret key of the application, change to something random before deployment
+# See here: https://flask.palletsprojects.com/en/2.0.x/config/#SECRET_KEY
+SECRET_KEY: dev
