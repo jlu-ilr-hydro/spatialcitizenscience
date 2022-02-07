@@ -41,7 +41,7 @@
                     container.title = "{{ map.location_btn }}";
 
                     container.style.backgroundColor = 'white';
-                    container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon.svg')}})";
+                    container.style.backgroundImage = "url({{ url_for('ui.static', filename='images/marker_icon.svg')}})";
                     container.style.backgroundSize = "30px 30px";
                     container.style.width = '33px';
                     container.style.height = '33px';
@@ -56,7 +56,7 @@
 
                     container.onclick = function () {
                         console.log('buttonClicked');
-                        container.style.backgroundImage = "url({{ url_for( 'static', filename='images/loading.svg')}})";
+                        container.style.backgroundImage = "url({{ url_for('ui.static', filename='images/loading.svg')}})";
                         mymap.locate({setView: true, maxZoom: 16});
                         mymap.on('locationfound', (e) => {
                             var radius = e.accuracy / 2;
@@ -75,7 +75,7 @@
                             circles = L.circle(e.latlng, radius);
                             mymap.addLayer(circles);
 
-                            container.style.backgroundImage = "url({{ url_for( 'static', filename='images/marker_icon_location_found.svg')}})";
+                            container.style.backgroundImage = "url({{ url_for('ui.static', filename='images/marker_icon_location_found.svg')}})";
                         });
 
                     }

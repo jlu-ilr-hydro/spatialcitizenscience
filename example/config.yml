@@ -1,7 +1,7 @@
 # Title of the project, simple html markup is allowed
 title: "Test-Title"
 # Base URL for the whole app
-base_url: /
+base_url: /test
 # The favicon, to use your own, save it at <config.yml path>/media/favicon.ico
 # and change it to media/favicon.ico
 favicon: images/favicon.ico

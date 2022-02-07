@@ -8,7 +8,7 @@ from .webtools import render_markdown
 from pathlib import Path
 
 
-ui = flask.Blueprint('ui', __name__, template_folder='../templates')
+ui = flask.Blueprint('ui', __name__, template_folder='../templates', static_folder='../static')
 ui.app_template_filter('clean')
 
 @ui.route('/', methods=['GET'])
