@@ -1,4 +1,4 @@
-__version__ = '2022.01.31a0'
+__version__ = '2022.02.07a1'
 
 import os
 
