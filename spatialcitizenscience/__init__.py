@@ -1,10 +1,7 @@
-__version__ = '2022.02.07a1'
-
-import os
+__version__ = '2022.06.09'
 
 import os
 import flask
-from pathlib import Path
 
 from .configuration import Config
 from . import database as db

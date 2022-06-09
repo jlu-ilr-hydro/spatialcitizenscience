@@ -9,9 +9,9 @@ fields = [
     Config(name='f_float', type='float', notnull=True, description='A float test äö', value='4.5'),
     Config(name='f_date', type='date', notnull=True, description='A date test äö', value=datetime.datetime.fromisoformat('2022-01-26')),
     Config(name='f_datetime', type='datetime', notnull=True, description='A datetime test äö', value=datetime.datetime.fromisoformat('2022-01-26 16:18:00')),
-    Config(name='f_select', type='str', notnull=True, description='A select test äö', options=['a', 'b', 'c'], value='a')
+    Config(name='f_select', type='str', notnull=True, description='A select test äö', options=['a', 'b', 'c'], value='a'),
+    Config(name='f_random', type='str', notnull=True, description='bla', random=5, value='x')
 ]
-
 
 @pytest.mark.parametrize('field', fields)
 def test_field_creation(field):

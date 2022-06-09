@@ -2,7 +2,9 @@
 from flask_wtf import FlaskForm
 import wtforms as wtf
 import datetime
-
+from ..configuration import Config
+from string import ascii_uppercase, digits
+import random
 
 def datetime_field_factory(*args, **kwargs):
     """
@@ -24,18 +26,42 @@ _field_types = dict(
 )
 
 
-def get_wtf_field(field):
+def get_wtf_field(field: Config) -> wtf.Field:
     """
     Create a WTForms field from a configuration of a field
     """
+    render_kw = {}
+    label = field.get('description', field.name)
+    FType = _field_types[field.type]
+
     if 'notnull' in field and field.notnull:
         validators = [wtf.validators.DataRequired()]
     else:
         validators = [wtf.validators.Optional()]
-    if 'options' in field:
-        return wtf.SelectField(field.description, choices=field.options, validators=validators)
+    if field.get('readonly'):
+        render_kw['disabled'] = 'disabled'
+    if 'default' in field:
+        if field.type.startswith('date') and  field['default'] == 'now':
+            value = datetime.datetime.now()
+        else:
+            value = field['default']
+    elif 'random' in field:
+        if field.type == 'int':
+            value = random.randint(0, 10 ** field.random)
+        elif field.type == 'str':
+            value = ''.join(random.choices(ascii_uppercase + digits, k=field.random))
+        elif field.type == 'float':
+            value = random.random() * 10 ** field.random
+        else:
+            raise ValueError('Only int, str, and float fields can have a random default')
 
-    return _field_types[field.type](field.description, validators=validators)
+    else:
+        value = None
+
+    if 'options' in field:
+        return wtf.SelectField(field.description, choices=field.options, validators=validators, default=value)
+    else:
+        return FType(label, validators=validators, default=value, render_kw=render_kw)
 
 
 def create_form_type(fields, use_flask_wtf=False):

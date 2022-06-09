@@ -92,7 +92,7 @@ def sites_csv():
     writer = csv.writer(dest, quoting=csv.QUOTE_MINIMAL)
 
     with Config() as config:
-        with db.Connection() as con:
+        with db.Connection(config) as con:
             writer.writerow(con.fieldnames)
             writer.writerows(con.read_entries())
 

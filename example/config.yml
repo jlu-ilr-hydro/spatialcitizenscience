@@ -26,9 +26,14 @@ database:
       type: float
       description: °E
       notnull: true
+    - name: label
+      type: str
+      random: 5
+      readonly: true
     - name: time
       type: datetime
       description: Date and time of measurement
+      default: now
       notnull: true
     - name: value
       type: float
@@ -37,6 +42,7 @@ database:
     - name: option
       type: str
       description: An example for options
+      default: Option A
       options:
         - ''
         - Option A
