@@ -31,7 +31,7 @@
             }
             get_color(props) {
                 let value = props[{{ map.legend.value | tojson }}];
-                if (value === undefined) {
+                if (value == null) {
                     return 'white';
                 }
                 for (let i=0; i < this.limits.length; i++) {
