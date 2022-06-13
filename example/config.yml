@@ -37,7 +37,6 @@ database:
       notnull: true
     - name: value
       type: float
-      notnull: true
       description: The value
     - name: option
       type: str

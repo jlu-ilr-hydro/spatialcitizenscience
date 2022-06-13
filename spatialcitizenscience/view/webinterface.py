@@ -48,18 +48,13 @@ def form():
     """
     with Config() as config:
         F = create_form_type(config.database.fields, use_flask_wtf=True)
-        data = dict(flask.request.args)
-        id = data.pop('id', -1)
         f: flask_wtf.FlaskForm = F()
         if f.validate_on_submit():
             with db.Connection(config) as con:
                 con.write_entry(**f.data)
             return flask.redirect(flask.url_for('ui.map'))
         else:
-            for k, v in flask.request.args.items():
-                 if k in f:
-                     ff = f[k]
-                     ff.process_formdata([v])
+            f.process(flask.request.args)
             return flask.render_template("form.html", form=f, title="Eingabe")
 
 
