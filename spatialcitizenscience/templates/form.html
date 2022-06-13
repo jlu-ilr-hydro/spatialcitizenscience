@@ -16,7 +16,9 @@
             </div>
         {% endif %}
     {% endfor %}
-    <input type="submit" />
+    <input type="submit" class="btn btn-ok form-control"/>
+    <a href="{{ url_for('ui.map') }}" class="btn btn-secondary form-control">Cancel</a>
+
   </form>
 </div>
 {% endblock content %}

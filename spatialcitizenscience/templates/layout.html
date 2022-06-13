@@ -49,10 +49,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarToggle">
                 <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="{{ url_for('ui.map') }}">{{ config.map.title | clean }}</a>
                     {% for page in config.navigation %}
                         <a class="nav-item nav-link" href="{{ url_for('ui.content', page=page) }}">{{ config.navigation[page] | clean }}</a>
                     {% endfor %}
-                    <a class="nav-item nav-link" href="{{ url_for('ui.map') }}">{{ config.map.title | clean }}</a>
                 </div>
             </div>
         </div>
