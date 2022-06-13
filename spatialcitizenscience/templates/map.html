@@ -72,7 +72,10 @@
 
             }
             _make_map() {
-                return L.map('mapid').setView([{{ map.lon }}, {{ map.lat }}], {{ map.zoomlevel }});
+                let lat = localStorage.getItem('center_lat') || {{ map.lat }};
+                let lng = localStorage.getItem('center_lng') || {{ map.lon }};
+                let zoom = localStorage.getItem('zoom') || {{ map.zoomlevel }};
+                return L.map('mapid').setView([lat, lng], zoom);
             }
             _make_tile_layer() {
                 return L.tileLayer('{{ map.tiles.source }}',
@@ -202,7 +205,6 @@
 
             }
         );
-
         var C = undefined;
         $(() => {
             C = new Controller();
@@ -219,9 +221,15 @@
                 C.markers = L.marker(e.latlng, {draggable:'true'});
                 C.lmap.addLayer(C.markers);
                 openEntryPopup(e);
-
-
             });
+            C.lmap.on('moveend', e => {
+                c = C.lmap.getCenter()
+                localStorage.setItem('center_lat', c.lat)
+                localStorage.setItem('center_lng', c.lng)
+            })
+            C.lmap.on('zoomend', e => {
+                localStorage.setItem('zoom', C.lmap.getZoom())
+            })
             C.load_sites();
         });
     </script>

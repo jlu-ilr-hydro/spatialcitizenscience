@@ -59,8 +59,8 @@ map:
   # Title in the navigation
   title: Map
   # Startup center / zoom of the map
-  lon: 51.1
-  lat: 9.8
+  lon: 9.8
+  lat: 51.1
   zoomlevel: 6
 
   # Map tile source, see here: https://leaflet-extras.github.io/leaflet-providers/preview/
