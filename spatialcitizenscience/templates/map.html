@@ -63,6 +63,7 @@
             constructor() {
                 this.lmap=this._make_map();
                 this.tile_layer = this._make_tile_layer();
+                this.circles = undefined;
                 this.legend = new Legend();
                 this.info = new InfoBox();
                 this.info.addTo(this.lmap);
@@ -178,19 +179,19 @@
                         mymap.on('locationfound', (e) => {
                             var radius = e.accuracy / 2;
 
-                            if (markers !== undefined) {
-                                mymap.removeLayer(markers);
+                            if (C.markers !== undefined) {
+                                mymap.removeLayer(C.markers);
                             }
-                            if (circles !== undefined) {
-                                mymap.removeLayer(circles);
+                            if (C.circles !== undefined) {
+                                mymap.removeLayer(C.circles);
                             }
 
                             C.markers = L.marker(e.latlng);
-                            mymap.addLayer(markers);
+                            mymap.addLayer(C.markers);
                             openEntryPopup(e);
 
-                            circles = L.circle(e.latlng, radius);
-                            mymap.addLayer(circles);
+                            C.circles = L.circle(e.latlng, radius);
+                            mymap.addLayer(C.circles);
 
                             container.style.backgroundImage = "url({{ url_for('ui.static', filename='images/marker_icon_location_found.svg')}})";
                         });
