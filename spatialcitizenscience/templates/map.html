@@ -174,7 +174,7 @@
                     container.onclick = function () {
                         console.log('buttonClicked');
                         container.style.backgroundImage = "url({{ url_for('ui.static', filename='images/loading.svg')}})";
-                        mymap.locate({setView: true, maxZoom: 18});
+                        mymap.locate({setView: true, maxZoom: 16});
                         mymap.on('locationfound', (e) => {
                             var radius = e.accuracy / 2;
 
