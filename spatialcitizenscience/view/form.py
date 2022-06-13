@@ -12,7 +12,7 @@ def datetime_field_factory(*args, **kwargs):
     and the correct format
     """
     kwargs.setdefault('default', datetime.datetime.now)
-    kwargs.setdefault('format', '%Y-%m-%dT%H:%M')
+    kwargs.setdefault('format', ["%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"])
     return wtf.DateTimeLocalField(*args, **kwargs)
 
 

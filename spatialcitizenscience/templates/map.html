@@ -1,29 +1,146 @@
 {% extends "layout.html" %}
 {% block map %}
+    <style>
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+    </style>
+
     <div id="mapid"></div>
 
     <div id="icon"></div>
     <script type="text/javascript">
 
+        function make_button(url, text) {
+            return `<a class="btn btn-light" href="${url}">${text}</a>`
+        }
+
+        class Legend {
+            constructor() {
+                this.colors = {{ map.legend.colors | tojson }};
+                this.limits = {{ map.legend.limits | tojson }};
+            }
+            get_color(props) {
+                let value = props[{{ map.legend.value | tojson }}];
+                if (value === undefined) {
+                    return 'white';
+                }
+                for (let i=0; i < this.limits.length; i++) {
+                    if (value < this.limits[i])
+                        return this.colors[i];
+                }
+                return this.colors[this.limits.length];
+            }
+        }
+        let InfoBox = L.Control.extend({
+            update: (props) => {
+                let text = '<h4>Info</h4>';
+                if (props) {
+                    text += '<ul>';
+                    for (let propname in props) {
+                        text += '<li>' + propname + ': ' + props[propname] + '</li>';
+                    }
+                    text += '</ul>';
+                }
+                this._div.innerHTML = text;
+            },
+            onAdd: (mymap) => {
+                this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                // this.update();
+                return this._div;
+            },
+        })
         class Controller {
             constructor() {
-                this.markers=undefined;
-                this.circles=undefined;
-                this.lmap=undefined;
-                this.info=undefined;
-                this.legend=undefined;
-                this.geojson=undefined;
+                this.lmap=this._make_map();
+                this.tile_layer = this._make_tile_layer();
+                this.legend = new Legend();
+                this.info = new InfoBox();
+                this.info.addTo(this.lmap);
+                this.markers = undefined;
+                this.geojson = undefined;
+
+            }
+            _make_map() {
+                return L.map('mapid').setView([{{ map.lon }}, {{ map.lat }}], {{ map.zoomlevel }});
+            }
+            _make_tile_layer() {
+                return L.tileLayer('{{ map.tiles.source }}',
+                {
+                    maxZoom: {{ map.tiles.maxZoom }},
+                    attribution: '{{ map.tiles.attribution }}',
+                    {% if map.tiles.get('accessToken') %}
+                        accessToken: '{{  map.tiles.access_token }}'
+                    {% endif %}
+                }
+            ).addTo(this.lmap);
+
+            }
+            make_sites(data) {
+                this.geojson = L.geoJSON(data, {
+                    onEachFeature: (feature, layer) => {
+                        layer.on({
+                            mouseover: function(e) {
+                                e.target.setStyle({
+                                    weight: 5,
+                                    color: '#666',
+                                    dashArray: '',
+                                    fillOpacity: 1.0
+                                });
+                                C.info.update(layer.feature.properties);
+                            },
+                            mouseout: function(e) {
+                                C.geojson.resetStyle(e.target);
+                                C.info.update();
+                            },
+                            click: e =>  {
+                                let props = e.target.feature.properties
+                                let form_url = '{{ url_for("ui.form") }}?' + $.param(props)
+                                e.target.bindPopup(
+                                    make_button(form_url, e.target.feature.properties[{{ map.legend.label | tojson}}])
+                                ).openPopup();
+                                L.DomEvent.stopPropagation(e);
+                            }
+                        });
+                    },
+                    pointToLayer: (feature, latlng) => {
+                        var marker = L.circleMarker(latlng,
+                            {
+                                radius: 8,
+                                fillColor: this.legend.get_color(feature.properties),
+                                color: "#000",
+                                weight: 1,
+                                opacity: 1,
+                                fillOpacity: 0.8
+                            });
+                        console.log(marker);
+                        return marker;
+                    }
+                }).addTo(this.lmap);
+            }
+            load_sites() {
+                fetch('{{ config.base_url }}/sites.geojson')
+                    .then(response => response.json())
+                    .then(data => this.make_sites(data))
             }
         }
 
-        C = new Controller();
 
 
         // Shows the "Create Entry" popup at the location e.latlng. Used for various event handlers
         function openEntryPopup(e) {
             let form_url = '{{ url_for("ui.form") }}?' + $.param({lat: e.latlng.lat, lon: e.latlng.lng})
             C.markers.bindPopup(
-                `<a class="btn btn-light" href="${form_url}">{{ map.location_msg }}</a>`
+                make_button(form_url, {{ map.location_msg  | tojson}})
             ).openPopup();
         }
 
@@ -57,7 +174,7 @@
                     container.onclick = function () {
                         console.log('buttonClicked');
                         container.style.backgroundImage = "url({{ url_for('ui.static', filename='images/loading.svg')}})";
-                        mymap.locate({setView: true, maxZoom: 16});
+                        mymap.locate({setView: true, maxZoom: 18});
                         mymap.on('locationfound', (e) => {
                             var radius = e.accuracy / 2;
 
@@ -85,40 +202,26 @@
             }
         );
 
-        let make_sites= (C) => {};
+        var C = undefined;
         $(() => {
-            C.lmap = L.map('mapid').setView([{{ map.lon }}, {{ map.lat }}], {{ map.zoomlevel }});
-            L.tileLayer('{{ map.tiles.source }}',
-                {
-                    maxZoom: {{ map.tiles.maxZoom }},
-                    attribution: '{{ map.tiles.attribution }}',
-            {% if map.tiles.get('accessToken') %}
-                    accessToken: '{{  map.tiles.access_token }}'
-            {% endif %}
-                }
-            ).addTo(C.lmap);
+            C = new Controller();
 
             C.lmap.addControl(new LocationButton());
             <!-- set up click on map event to create a marker -->
             C.lmap.on('click', function(e){
                 if (C.info !== undefined) {
-                    C.info._div.innerHTML = e.latlng.toString();
-                } else {
-                    if (C.markers !== undefined) {
-                        C.lmap.removeLayer(C.markers);
-                    }
-                    if (C.circles !== undefined) {
-                        C.lmap.removeLayer(C.circles);
-                    }
-                    C.markers = L.marker(e.latlng, {draggable:'true'});
-                    C.lmap.addLayer(C.markers);
-                    openEntryPopup(e);
-
-                    C.markers.on('dragend', openEntryPopup);
-
+                    C.info.update({lat: e.latlng.lat, lon: e.latlng.lng});
                 }
+                if (C.markers !== undefined) {
+                    C.lmap.removeLayer(C.markers);
+                }
+                C.markers = L.marker(e.latlng, {draggable:'true'});
+                C.lmap.addLayer(C.markers);
+                openEntryPopup(e);
+
+
             });
-            make_sites(C);
+            C.load_sites();
         });
     </script>
     {% block site_map_script %}{% endblock %}

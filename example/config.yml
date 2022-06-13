@@ -29,7 +29,7 @@ database:
     - name: label
       type: str
       random: 5
-      readonly: true
+      readonly: false
     - name: time
       type: datetime
       description: Date and time of measurement
@@ -77,6 +77,12 @@ map:
 
   # Caption of the create site button
   location_msg: Create new entry...
+  legend:
+    # The field to use as coloring value, should be a float field
+    value: value
+    colors: ['#2c7bb6','#abd9e9','#ffffbf','#fdae61','#d7191c']
+    limits: [10, 25, 50, 100]
+    label: label
 
 # Secret key of the application, change to something random before deployment
 # See here: https://flask.palletsprojects.com/en/2.0.x/config/#SECRET_KEY

@@ -51,7 +51,7 @@
                     return this.colors[this.limits.length];
                 }
             };
-            $.getJSON('{{ config.base_url }}sites.geojson', {},
+            $.getJSON('{{ config.base_url }}/sites.geojson', {},
                 function(data) {
                     console.log(data);
                     C.geojson = L.geoJSON(data, {

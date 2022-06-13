@@ -1,4 +1,6 @@
 import flask as flask
+import flask_wtf
+import wtforms
 
 from ..configuration import Config
 from .. import database as db
@@ -46,15 +48,18 @@ def form():
     """
     with Config() as config:
         F = create_form_type(config.database.fields, use_flask_wtf=True)
-        f = F()
-
+        data = dict(flask.request.args)
+        id = data.pop('id', -1)
+        f: flask_wtf.FlaskForm = F()
         if f.validate_on_submit():
             with db.Connection(config) as con:
                 con.write_entry(**f.data)
             return flask.redirect(flask.url_for('ui.map'))
         else:
             for k, v in flask.request.args.items():
-                f[k].data = v
+                 if k in f:
+                     ff = f[k]
+                     ff.process_formdata([v])
             return flask.render_template("form.html", form=f, title="Eingabe")
 
 
