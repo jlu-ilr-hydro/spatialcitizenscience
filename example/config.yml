@@ -65,7 +65,7 @@ map:
 
   # Map tile source, see here: https://leaflet-extras.github.io/leaflet-providers/preview/
   tiles:
-    source: https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png
+    source: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
     attribution: 'Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © OpenTopoMap (CC-BY-SA) (https://opentopomap.org/about)'
     maxZoom: 17
     # Access token might be needed for some map tile providers, eg. Mapbox, ESRI
