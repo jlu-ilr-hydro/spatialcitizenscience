@@ -86,3 +86,4 @@ map:
 # Secret key of the application, change to something random before deployment
 # See here: https://flask.palletsprojects.com/en/2.0.x/config/#SECRET_KEY
 SECRET_KEY: dev
+DEBUG: True

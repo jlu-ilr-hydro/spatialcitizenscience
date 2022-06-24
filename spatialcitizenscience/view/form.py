@@ -5,6 +5,7 @@ import datetime
 from ..configuration import Config
 from string import ascii_uppercase, digits
 import random
+import typing
 
 def datetime_field_factory(*args, **kwargs):
     """
@@ -26,7 +27,7 @@ _field_types = dict(
 )
 
 
-def get_wtf_field(field: Config) -> wtf.Field:
+def get_wtf_field(field: Config, ignore_readonly=False) -> wtf.Field:
     """
     Create a WTForms field from a configuration of a field
     """
@@ -38,7 +39,7 @@ def get_wtf_field(field: Config) -> wtf.Field:
         validators = [wtf.validators.DataRequired()]
     else:
         validators = [wtf.validators.Optional()]
-    if field.get('readonly'):
+    if field.get('readonly') and not ignore_readonly:
         render_kw['disabled'] = 'disabled'
     if 'default' in field:
         if field.type.startswith('date') and field['default'] == 'now':
@@ -59,12 +60,12 @@ def get_wtf_field(field: Config) -> wtf.Field:
         value = None
 
     if 'options' in field:
-        return wtf.SelectField(field.description, choices=field.options, validators=validators, default=value)
+        return wtf.SelectField(label, choices=field.options, validators=validators, default=value)
     else:
         return FType(label, validators=validators, default=value, render_kw=render_kw)
 
 
-def create_form_type(fields, use_flask_wtf=False):
+def create_form_type(fields: list, edit_id=None):
     """
     Create a WTFForms form class, either inheriting from `WTForms.Form` or from `flask_wtf.FlaskForm`
     :param fields: List of
@@ -75,12 +76,14 @@ def create_form_type(fields, use_flask_wtf=False):
     >>>Form = create_from_type(config.database.fields)
     >>>form = Form()
     """
-    Form = FlaskForm if use_flask_wtf else wtf.Form
-    return type(
-        'SpCiSciForm', (Form, ),
-        {
-            field.name: get_wtf_field(field)
-            for field in fields
-        }
-    )
+    Form = FlaskForm
+    html_fields = {
+        field.name: get_wtf_field(field, ignore_readonly=bool(edit_id))
+        for field in fields
+    }
+
+    if edit_id:
+        html_fields['id'] = wtf.HiddenField(name='id')
+
+    return type('SpCiSciForm', (Form, ), html_fields)
 

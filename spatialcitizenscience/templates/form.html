@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="form">
-  <form action="form" method="post">
+  <form method="post">
     {% for field in form %}
         {%  if not field.flags.hidden  %}
             {{ field.label }}

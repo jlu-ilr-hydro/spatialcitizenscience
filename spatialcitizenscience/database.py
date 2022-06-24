@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 import geojson
+from collections.abc import Mapping
 # from .configuration import get_config
 import os
 
@@ -20,7 +21,7 @@ str_to_python_type = dict(
 )
 
 
-class Entry:
+class Entry(Mapping):
 
     def __init__(self, fieldnames, *values):
         self._fieldnames = ['id'] + list(fieldnames)
@@ -41,9 +42,22 @@ class Entry:
         elif item in range(len(self._values)):
             return self._values[item]
         else:
-            raise IndexError(f'This entry has no field or item position {item}')
+            raise KeyError(f'This entry has no field or item position {item}')
 
+    def __len__(self):
+        return len(self._fieldnames)
 
+    def __iter__(self):
+        return iter(self._fieldnames)
+
+    def __repr__(self):
+        return 'Entry(' + ', '.join(f'{f}={v!r}' for f, v in zip(self._fieldnames, self._values)) + ')'
+
+    def getlist(self, key, type=None):
+        if not type:
+            return [self[key]]
+        else:
+            return type([self[key]])
 
 
 class Connection:
@@ -130,6 +144,22 @@ class Connection:
         if debug:
             print('    ->', c.fetchall())
 
+    def update_entry(self, id, **kwargs):
+        values = [kwargs[k] for k in kwargs if k in self.fieldnames]
+        fields = [k for k in kwargs if k in self.fieldnames]
+        set_clause = ', '.join(f'{f}=?' for f in fields)
+        cmd = f'UPDATE {self.tablename}\n   SET {set_clause}\n   WHERE id=?'.format(
+            tn=self.tablename,
+        )
+        if debug:
+            print(cmd)
+            print(values, [id])
+
+        c = self.execute(cmd, values + [id])
+        if debug:
+            print('    ->', c.fetchall())
+
+
     def commit(self):
         """
         Commits a Database action
@@ -173,15 +203,11 @@ class Connection:
             yield Entry(self.fieldnames, *row)
 
     def features(self):
-        def make_feature_from_row(row):
-            p = geojson.Point([row.lon, row.lat])
-            props = {fieldname: value
-                     for fieldname, value in
-                     zip(['id'] + self.fieldnames, row)
-                     }
-            f = geojson.Feature(row[0], p, properties=props)
+        def make_feature_from_row(entry):
+            p = geojson.Point([entry.lon, entry.lat])
+            f = geojson.Feature(entry[0], p, properties=dict(entry))
             return f
 
-        for row in self.read_entries():
-            yield make_feature_from_row(row)
+        for entry in self.read_entries():
+            yield make_feature_from_row(entry)
 

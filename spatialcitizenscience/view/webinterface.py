@@ -47,7 +47,7 @@ def form():
     Displays the data entry form. The data entry form uses the config.database.fields to show the entries
     """
     with Config() as config:
-        F = create_form_type(config.database.fields, use_flask_wtf=True)
+        F = create_form_type(config.database.fields)
         f: flask_wtf.FlaskForm = F()
         if f.validate_on_submit():
             with db.Connection(config) as con:
@@ -56,6 +56,23 @@ def form():
         else:
             f.process(flask.request.args)
             return flask.render_template("form.html", form=f, title="Eingabe")
+
+
+@ui.route('/edit', methods=['GET', 'POST'])
+def edit():
+    with Config() as config:
+        F = create_form_type(config.database.fields, edit_id=True)
+        f: flask_wtf.FlaskForm = F()
+        if f.validate_on_submit():
+            with db.Connection(config) as con:
+                con.update_entry(**f.data)
+            return flask.redirect(flask.url_for('ui.map'))
+        else:
+            with db.Connection(config) as con:
+                entry: db.Entry = next(con.read_entries(**flask.request.args))
+                f.process(entry)
+            return flask.render_template("form.html", form=f, title="Eingabe")
+
 
 
 @ui.route('/map', methods=['GET'])
