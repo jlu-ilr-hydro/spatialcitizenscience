@@ -11,7 +11,7 @@ def datetime_field_factory(*args, **kwargs):
     A factory to create a DateTimeLocalField with "now" as the default value
     and the correct format
     """
-    kwargs.setdefault('default', datetime.datetime.now)
+    kwargs.setdefault('default', datetime.datetime.now())
     kwargs.setdefault('format', ["%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"])
     return wtf.DateTimeLocalField(*args, **kwargs)
 
@@ -41,7 +41,7 @@ def get_wtf_field(field: Config) -> wtf.Field:
     if field.get('readonly'):
         render_kw['disabled'] = 'disabled'
     if 'default' in field:
-        if field.type.startswith('date') and  field['default'] == 'now':
+        if field.type.startswith('date') and field['default'] == 'now':
             value = datetime.datetime.now()
         else:
             value = field['default']
