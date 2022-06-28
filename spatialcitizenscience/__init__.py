@@ -1,4 +1,4 @@
-__version__ = '2022.06.23'
+__version__ = '2022.06.28'
 
 import os
 import flask
