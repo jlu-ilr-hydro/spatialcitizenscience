@@ -2,11 +2,13 @@ __version__ = '2022.06.28'
 
 import os
 import flask
+import logging
 
 from .configuration import Config
 from . import database as db
 from . import view
 
+logging.basicConfig(filename='/app/spc.log', encoding='utf-8', level=logging.INFO)
 
 def create_app(test_config=None):
     home = Config.find_home()
